@@ -3,6 +3,10 @@
 <head>
     @include('links')
     <link href="{{ asset('css/quick-preview-style.css') }}" rel="stylesheet">
+    <!-- Uključivanje Swiper.js biblioteke -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
 </head>
 <body>
     <div class="mfp-bg mfp-ready"></div>
@@ -21,51 +25,89 @@
                                             data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d" 
                                             data-spacebetween="0" data-autoplay="false" data-autospeed="300" data-items="1" data-mobileItems="1" data-tabletItems="1">
                                                 <div class="swiper-wrapper" style="height:455px; transform: translate3d(0px, 0px, 0px)" id="swiper-wrapper-1" aria-live="polite">
-                                                    <div class="swiper-slide swiper-slide-active" style="width: 455px; height: 100%" role="group" aria-label="1 / 5">
-                                                        <a href="">
+                                                    <div class="swiper-slide swiper-slide-active" style="width: 100%; height: 100%" role="group" aria-label="1 / 8">
+                                                        <a href="">    
                                                             <img src="{{ asset('images/phones3.jpg') }}">
                                                         </a>
                                                     </div>
-                                                    <div class="swiper-slide swiper-slide-active" style="width: 455px; height: 100%" role="group" aria-label="2 / 5">
+                                                    <div class="swiper-slide swiper-slide-active" style="width: 100%; height: 100%" role="group" aria-label="2 / 8">
                                                         <a href="">
                                                             <img src="{{ asset('images/phones2.jpg') }}">
                                                         </a>
                                                     </div>
-                                                    <div class="swiper-slide swiper-slide-active" style="width: 455px; height: 100%" role="group" aria-label="3 / 5">
+                                                    <div class="swiper-slide swiper-slide-active" style="width: 100%; height: 100%" role="group" aria-label="3 / 8">
                                                         <a href="">
-                                                            <img src="{{ asset('images/iPhone 14 Pro Max.png') }}">
+                                                            <img src="{{ asset('images/phones4.jpg') }}" alt="">
                                                         </a>
                                                     </div>
-                                                    <div class="swiper-slide swiper-slide-active" style="width: 455px; height: 100%" role="group" aria-label="4 / 5">
+                                                    <div class="swiper-slide swiper-slide-active" style="width: 100%; height: 100%" role="group" aria-label="4 / 8">
                                                         <a href="">
-                                                            <img src="{{ asset('images/phones3.jpg') }}">
+                                                            <img src="{{ asset('images/phones.jpg') }}" alt="">
                                                         </a>
                                                     </div>
-                                                    <div class="swiper-slide swiper-slide-active" style="width: 455px; height: 100%" role="group" aria-label="5 / 5">
-                                                        <a href="">
-                                                            <img src="{{ asset('images/phones.jpg') }}">
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="swiper-button-prev" tabindex="0" role="button" aria-label="Previous slide" aria-controls="swiper-wrapper-2" aria-disabled="false"></div>
-                                                    <div class="swiper-button-next swiper-button-disabled" tabindex="-1" role="button" aria-label="Next slide" aria-controls="swiper-wrapper-1" aria-disabled="true"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="thumbnails-wrapper">
-                                            <div id="product-thumbnails" class="swiper-container swiper-container-initialized swiper-container-horizontal swiper-container-pointer-events swiper-container-free-mode swiper-container-thumbs slider-loaded" data-efect="slide"
-                                                data-direction="horizontal" data-loop="false" data-speed="1000"
-                                                data-spacebetween="5" data-autoplay="false" data-autospeed="300"
-                                                data-items="4" data-mobileitems="1" data0tabletitems="1">
-                                                <div class="swiper-wrapper" style="transform: tanslate3d(0px, 0px, 0px);">
-                                                    <div class="swiper-slide swiper-slide-visible swiper-slide-active swiper-slide-thumb-active"
-                                                        style="width: 85.5px; margin-right: 7px;" role="group" aria-label="1 / 4">
+                                                    <div class="swiper-slide swiper-slide-active" style="width: 100%; height: 100%" role="group" aria-label="5 / 8">
                                                         <a href="">
                                                             <img src="{{ asset('images/phones3.jpg') }}" alt="">
                                                         </a>
                                                     </div>
+                                                    <div class="swiper-slide swiper-slide-active" style="width: 100%; height: 100%" role="group" aria-label="6 / 8">
+                                                    <a href="">
+                                                            <img src="{{ asset('images/phones3.jpg') }}" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="swiper-slide swiper-slide-active" style="width: 100%; height: 100%" role="group" aria-label="7 / 8">
+                                                        <a href="">
+                                                            <img src="{{ asset('images/phones3.jpg') }}" alt="">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-button-prev" tabindex="0" role="button" aria-label="Previous slide" aria-controls="swiper-wrapper-2" aria-disabled="true"></div>
+                                                <div class="swiper-button-next" tabindex="-1" role="button" aria-label="Next slide" aria-controls="swiper-wrapper-1" aria-disabled="false"></div>
+                                            </div>
+                                        </div>
+                                        <div class="thumbnails-wrapper">
+                                            <div id="product-thumbnails" class="swiper-container swiper-container-initialized swiper-container-horizontal swiper-container-pointer-events swiper-container-free-mode swiper-container-thumbs slider-loaded" data-efect="slide"
+                                                data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d" 
+                                                data-spacebetween="0" data-autoplay="false" data-autospeed="300" data-items="1" data-mobileItems="1" data-tabletItems="1">
+                                                <div class="swiper-wrapper swiper-wrapper2">
                                                     <div class="swiper-slide swiper-slide-visible swiper-slide-active swiper-slide-thumb-active"
-                                                        style="width: 85.5px; margin-right: 7px;" role="group" aria-label="2 / 4">
+                                                        style="width: 85.5px; margin-right: 7px;" role="group" aria-label="1 / 8">
+                                                        <a href="#">
+                                                            <img src="{{ asset('images/phones3.jpg') }}" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="swiper-slide swiper-slide-visible swiper-slide-next"
+                                                        style="width: 85.5px; margin-right: 7px;" role="group" aria-label="2 / 8">
+                                                        <a href="">
+                                                            <img src="{{ asset('images/phones2.jpg') }}" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="swiper-slide swiper-slide-visible swiper-slide-next"
+                                                        style="width: 85.5px; margin-right: 7px;" role="group" aria-label="3 / 8">
+                                                        <a href="">
+                                                            <img src="{{ asset('images/phones4.jpg') }}" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="swiper-slide swiper-slide-visible swiper-slide-next"
+                                                        style="width: 85.5px; margin-right: 7px;" role="group" aria-label="4 / 8">
+                                                        <a href="">
+                                                            <img src="{{ asset('images/phones.jpg') }}" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="swiper-slide swiper-slide-visible swiper-slide-next"
+                                                        style="width: 85.5px; margin-right: 7px;" role="group" aria-label="5 / 8">
+                                                        <a href="">
+                                                            <img src="{{ asset('images/phones3.jpg') }}" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="swiper-slide swiper-slide-visible swiper-slide-next"
+                                                        style="width: 85.5px; margin-right: 7px;" role="group" aria-label="6 / 8">
+                                                        <a href="">
+                                                            <img src="{{ asset('images/phones3.jpg') }}" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="swiper-slide swiper-slide-visible swiper-slide-next"
+                                                        style="width: 85.5px; margin-right: 7px;" role="group" aria-label="7 / 8">
                                                         <a href="">
                                                             <img src="{{ asset('images/phones3.jpg') }}" alt="">
                                                         </a>
@@ -77,7 +119,9 @@
                                 </div>
                             </div>
                             <div class="col col-12 col-lg-6">
-                                <h1 class="product-title entry-title">Luksuz za Vašu Tehnologiju - Apple iPhone 14 Pro Max</h1>
+                                <a href="#" style="text-decoration: none; color: var(--font-color)">
+                                    <h1 class="product-title entry-title">Luksuz za Vašu Tehnologiju - Apple iPhone 14 Pro Max</h1>
+                                </a>
                                 <div class="product-meta">
                                     <div class="product-model">
                                         <span>Brend: <b>APPLE</b> </span>
@@ -168,6 +212,7 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="ad-description">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eos qui laudantium ab, quibusdam unde similique. Omnis possimus nam ipsum magni molestias animi, eius doloribus temporibus nobis, inventore tenetur. Vero, illum...</div>
                     </div>
                 </div>
             </div>
@@ -175,3 +220,36 @@
     </div>
 </body>
 </html>
+
+<script>
+    const next = document.querySelector('.swiper-button-next');
+    next.addEventListener('click', function(){
+
+    })
+
+    // Inicijalizacija Swiper komponente
+    var swiper = new Swiper('#product-images', {
+        slidesPerView: 1,
+        spaceBetween: 0,
+        loop: false,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+
+    var thumbnailSwiper = new Swiper('#product-thumbnails', {
+        slidesPerView: 'auto',
+        spaceBetween: 5, 
+        freeMode: true, 
+        loop: false
+    });
+
+    var thumbnailSlides = document.querySelectorAll('.swiper-slide');
+    thumbnailSlides.forEach(function (slide, index) {
+        slide.addEventListener('click', function () {
+            console.log(index - 7);
+            swiper.slideTo(index - 7); 
+        });
+    });
+</script>

@@ -1,4 +1,4 @@
-function createWidget(data, i){
+function createWidget(data, i) {
 
     var productData = {
         imageUrl: data['main-image'],
@@ -13,7 +13,7 @@ function createWidget(data, i){
         images: data['images'],
         username: data['creatorUsername']
     };
-    
+
     var productHtml = `
         <div class="product-wrapper product-type-1">
             <div class="product-content">
@@ -45,7 +45,7 @@ function createWidget(data, i){
                         <a href="" class="wishlist klbwl-btn"></a>
                         <a href="" class="mostcomments"></a>
                         <a href="" class="klbcp-btn klbcp-btn-521"></a>
-                        <a href="" class="detail-bnt quickview animated"></a>
+                        <a class="detail-bnt quickview animated" style="cursor: pointer;" onclick="showQuickView()"></a>
                     </div>
                 </div>
                 <div class="content-wrapper">
