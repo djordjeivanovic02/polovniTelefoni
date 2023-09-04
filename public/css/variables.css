@@ -1,0 +1,13 @@
+:root {
+    --main-color: #ed6969;
+    --main-hover-color: #ed3636;
+    --font-color: rgb(2, 21, 35);
+    --default-border-color: #ced4da;
+    --placeholder-color: #98a5b3;
+    --grey-background: #f7f8f9;
+    --third-color: #2f3748;
+    --popup-background: rgba(0, 0, 0, 0.5);
+    --button-blue-color: #0070dc;
+    --button-blue-color-hover: #24a0ed;
+    --star-color: #ffc21f;
+}
