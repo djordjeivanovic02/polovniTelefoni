@@ -1,0 +1,181 @@
+@import url('variables.css');
+
+.elementor-section {
+    margin-top: 65px;
+    margin-bottom: 0px;
+}
+
+.elementor-section.elementor-section-boxed>.elementor-container {
+    max-width: 1290px;
+}
+
+.elementor-section .elementor-container {
+    display: flex;
+    margin-right: auto;
+    margin-left: auto;
+    position: relative;
+    width: 100%;
+}
+
+.elementor-column {
+    position: relative;
+    min-height: 1px;
+    display: flex;
+}
+
+.elementor-column-gap-extended>.elementor-column>.elementor-element-populated {
+    padding: 15px 0;
+}
+
+.elementor:not(.elementor-bc-flex-widget) .elementor-widget-wrap {
+    display: flex;
+}
+
+.elementor-widget-wrap {
+    position: relative;
+    width: 100%;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+.elementor-widget-wrap>.elementor-element {
+    width: 100%;
+}
+
+.woocommerce-cart-form {
+    position: relative;
+}
+
+table {
+    max-width: 100%;
+    background-color: transparent;
+    width: 100%;
+}
+
+table {
+    caption-side: bottom;
+    border-collapse: collapse;
+}
+
+.table>thead {
+    vertical-align: bottom;
+}
+
+.elementor-screen-only,
+.screen-reader-text,
+.screen-reader-text span {
+    position: absolute;
+    top: -10000em;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.woocommerce-cart-form table th {
+    font-size: .75rem;
+    font-weight: 600;
+    border-top: 0;
+    border-bottom: 1px solid var(--placeholder-color);
+    color: var(--placeholder-color);
+}
+
+.woocommerce-cart-form table tbody td:first-child {
+    padding-left: 0;
+}
+
+.woocommerce-cart-form table td a {
+    color: var(--font-color);
+    text-decoration: none;
+}
+
+td.klbwl-item--image img {
+    max-width: 65px;
+}
+
+.elementor img {
+    height: auto;
+    max-width: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.woocommerce-cart-form table th {
+    border: none;
+    border-bottom: 1px solid var(--placeholder-color);
+}
+
+.woocommerce-cart-form table td a {
+    color: var(--font-color);
+    text-decoration: none;
+}
+
+td.klbwl-item--name a {
+    font-weight: 700;
+}
+
+td.klbwl-item--price span {
+    font-weight: 700;
+}
+
+.woocommerce-cart-form table td {
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+td.klbwl-item--addtocart p {
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+td.klbwl-item--addtocart button {
+    border: none;
+    border-radius: 5px;
+    background-color: var(--green-button);
+    padding: 10px;
+    color: white;
+    font-weight: 700;
+    transition-duration: .5s;
+}
+
+td.klbwl-item--addtocart button:hover {
+    background-color: var(--green-button-hover);
+}
+
+td.klbwl-item--remove span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: fantasy;
+    font-size: .9375rem;
+    font-weight: 700;
+    line-height: 1;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: #FFF;
+    background-color: var(--main-hover-color);
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+}
+
+
+[class^=klbth-icon-]:before,
+[class*=" klbth-icon-"]:before {
+    content: '\2716';
+    font-style: normal;
+    display: inline-block;
+    text-decoration: inherit;
+    color: white;
+    width: 2em;
+    margin-right: 0.2em;
+    text-align: center;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 2em;
+    margin-left: 0.2em;
+}

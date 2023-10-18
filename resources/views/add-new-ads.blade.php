@@ -372,6 +372,7 @@
                         slika.style.display = 'block';
                         slika.title = "Klikni za brisanje";
                         dropZone.style.border = 'none';
+                        dropZone.querySelector('span').style.display = 'none';
 
                         fileInput.disabled = true;
                         var fileList = new DataTransfer();
@@ -382,6 +383,7 @@
 
                         slika.addEventListener('click', () => {
                             slika.style.display = "none";
+                            dropZone.querySelector('span').style.display = 'block';
                             fileList.items.remove(file);
                             // Postavite kreirani FileList kao vrednost input polja
                             fileInput.files = fileList.files;

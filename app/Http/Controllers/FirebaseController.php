@@ -23,28 +23,30 @@ use App\Models\Ad;
 
 use Illuminate\Support\Facades\Cache;
 
+use Google\Cloud\Firestore\FirestoreClient;
+
 class FirebaseController extends Controller
 {
 
-    protected $auth, $database, $storage;
+    protected $auth, $database, $storage, $firestore;
 
     public function __construct(){
         $firebase = (new Factory)
             ->withServiceAccount(__DIR__.'/polovni-telefoni-b4d1c-firebase-adminsdk-ekkpf-0e0ef01ce7.json')
             ->withDatabaseUri('https://polovni-telefoni-b4d1c-default-rtdb.firebaseio.com');
-        
+
+        $this->firestore = new FirestoreClient([
+            'projectId' => 'polovni-telefoni-b4d1c',
+        ]);
         $this->auth = $firebase->createAuth();
         $this->database = $firebase->createDatabase();
         $this->storage = $firebase->createStorage();
     }
     public function checkUsernameAvailability($username){
-        $databaseRef = $this->database->getReference('user');
-    
-        $query = $databaseRef->orderByChild('username')->equalTo($username);
-        $snapshot = $query->getValue();
-    
-        if ($snapshot) return false; // username je zauzet
-        else return true; // username je slobodan
+        $collection = $this->firestore->collection('users');
+        $query = $collection->where('username', '=', $username);
+        $documents = $query->documents();
+        return $documents->isEmpty();
     }
     public function checkEmailAvailability($email){
         $databaseRef = $this->database->getReference('subscriber');
@@ -77,18 +79,17 @@ class FirebaseController extends Controller
             if(!FirebaseController::checkUsernameAvailability($username)) return 4; // username zauzet
 
             //kreira novog korisnika
-            $newUser = $this->auth->createUserWithEmailAndPassword($email, $password);
-            $uid = $newUser->uid;
-            //unosi username u bazu
-            $ref = $this->database->getReference('user/'.$uid);
-            $ref->set([
+            $uid = $this->auth->createUserWithEmailAndPassword($email, $password)->uid;
+            $collection = $this->firestore->collection('users');
+            $documentReference = $collection->document($uid);
+            $data = [
                 'username' => $username,
                 'first-name' => '',
                 'second-name' => '',
-            ]);
+            ];
+            $documentReference->set($data);
             $this->auth->sendEmailVerificationLink($email);
             return 1;
-            //return redirect()->away('welcome');
         }catch(\Throwable $e){
             return $e->getMessage();
             switch ($e->getMessage()) {
@@ -105,7 +106,6 @@ class FirebaseController extends Controller
         }
     }
     public function signIn(Request $request){
-        
         $email = $request->input('email_username');
         $password = $request->input('password');
         try{
@@ -113,16 +113,23 @@ class FirebaseController extends Controller
             $idToken = $signInResult->idToken();
             $verifiedIdToken = $this->auth->verifyIdToken($idToken);
 
-            if ($verifiedIdToken->claims()->get('email_verified')) {
-                $uid = $verifiedIdToken->claims()->get('sub');
-                FirebaseController::getMyData($uid, $email);
-                Session::put('firebaseUserId', $signInResult->firebaseUserId());
-                Session::put('idToken', $signInResult->idToken());
-                Session::save();
-
-                return 1;
-            } 
-            return 5;
+            if ($verifiedIdToken->claims()->has('email_verified')) {
+                if ($verifiedIdToken->claims()->get('email_verified')) {
+                
+                    $uid = $verifiedIdToken->claims()->get('sub');
+                    FirebaseController::getMyData($uid, $email);
+                    Session::put('firebaseUserId', $signInResult->firebaseUserId());
+                    Session::put('idToken', $signInResult->idToken());
+                    Session::save();
+                    Cache::forget("cached_ads_page_1");
+                    return 1;
+                } else {
+                    // The email is not verified
+                    return 5;
+                }
+            } else {
+                return 5; // Or handle the case as needed
+            }
         }catch(\Throwable $e){
             return $e->getMessage();
             switch ($e->getMessage()) {
@@ -163,7 +170,6 @@ class FirebaseController extends Controller
             }
         }
     }
-
     public function signOut(){
         if(Session::has('firebaseUserId') && Session::has('idToken')){
             $this->auth->revokeRefreshTokens(Session::get('firebaseUserId'));
@@ -171,10 +177,8 @@ class FirebaseController extends Controller
             Session::forget('idToken');
             Session::forget('user');
             Session::save();
-
+            Cache::forget("cached_ads_page_1");
             return redirect()->route('welcome');
-            //return redirect()->away('../');
-            //dd('Korisnik je odjavljen');
         }else{
             //dd('Korisnik je vec odjavljen');
         }
@@ -197,22 +201,24 @@ class FirebaseController extends Controller
             return false;
         }
     }
-
     public function getMyData($uid='', $email){
         if($uid == '')
             $uid = FirebaseController::getUserUID();
-        $ref = $this->database->getReference('user')->getValue();
-        
-        $user = new UserModel(
-            $email,  
-            $ref[$uid]["username"],
-            $ref[$uid]["first-name"],
-            $ref[$uid]["second-name"],
-        );
-        Session::put('user', $user);
-        Session::save();
+        $collection = $this->firestore->collection('users');
+        $documentReference = $collection->document($uid);
+        $snapshot = $documentReference->snapshot();
+        if($snapshot->exists()){
+            $documentData = $snapshot->data();
+            $user = new UserModel(
+                $email,  
+                $documentData["username"],
+                $documentData["first-name"],
+                $documentData["second-name"],
+            );
+            Session::put('user', $user);
+            Session::save();
+        }
     }
-
     public function getUserUID(){
         $idToken = Session::get('idToken');
         if(empty($idToken)) {
@@ -240,16 +246,23 @@ class FirebaseController extends Controller
         $uid = $this->getUserUID();
         try{
             $userData = Session::get('user');
-            $ref = $this->database->getReference('user/'.$uid);
+            $collection = $this->firestore->collection('users');
+            $documentReference = $collection->document($uid);
+            $snapshot = $documentReference->snapshot();
+
             if($userData->getUsername() != $username && !$this->checkUsernameAvailability($username)) return 2;
-            $ref->update([
-                'first-name' => $firstName,
-                'second-name' => $secondName,
-                'username' => $username,
-            ]);
+            
+            if($snapshot->exists()){
+                $documentData = $snapshot->data();
+                $documentData['first-name'] = $firstName;
+                $documentData['second-name'] = $secondName;
+                $documentData['username'] = $username;
+                $documentReference->set($documentData);
+            }
+
             $this->getMyData($uid, $email);
 
-            $firebaseUser = $this->auth->getUserByEmail($email);
+            //$firebaseUser = $this->auth->getUserByEmail($email);
             // $firebaseUser->updatePassword($new_password);
 
             return 1;
@@ -275,7 +288,6 @@ class FirebaseController extends Controller
             return $e;
         }
     }
-
     public function mobilePhoneMainImage(Request $request){
         $phoneBrand = $request->input('phoneBrand');
         $phoneModel = $request->input('phoneModel');
@@ -291,24 +303,6 @@ class FirebaseController extends Controller
             echo $e->getMessage();
         }
     }
-
-    public function getLastNumericKey() {
-        $ref = $this->database->getReference('ads')
-            ->orderByKey()
-            ->limitToLast(1)
-            ->getValue();
-        
-        if (!empty($ref)) {
-            if(count($ref) == "2"){
-                return 1;
-            }else{
-                return key($ref);
-            }
-        } else {
-            return 0;
-        }
-    }
-
     public function addNewAds(Request $request){
         $adsTitle = $request->input('adsTitle');
         $category = $request->input('category');
@@ -374,9 +368,10 @@ class FirebaseController extends Controller
         }
 
         $date = date('d-m-y h:i:s');
-        $randomText = $this->getLastNumericKey() + 1;
-        $ref = $this->database->getReference('ads/'.$randomText);
-        $ref->set([
+
+
+        $collection = $this->firestore->collection('ads');
+        $data = [
             'user' => $uid,
             'adsTitle' => $adsTitle,
             'category' => $categoryValue,
@@ -392,7 +387,11 @@ class FirebaseController extends Controller
             'confirmed' => false,
             'bad' => $bad,
             'rates' => 0,
-        ]);
+        ];
+        $document = $collection->add($data);
+        //$firestore->getFirebase()->getConnection()->close();
+
+        $images = [];
         for($i = 0; $i <= 8; $i++){
             $file = $request->file('file_' . $i);
             if ($file) {
@@ -402,80 +401,239 @@ class FirebaseController extends Controller
 
                 $storage = $this->storage;
                 $bucket = $storage->getBucket();
-                $destinationPath = 'ads/' . $randomText . '/images/' . $fileName;
+                $destinationPath = 'ads/' . $document->id() . '/images/' . $fileName;
                 $storageReference = $bucket->upload(
                     fopen($file->getPathname(), 'r'),
                     ['name' => $destinationPath]
                 );
+                array_push($images, 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/ads%2F'.$document->id().'%2Fimages%2F'.$fileName.'?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800');
             }
         }
+        $document->update([
+            ['path' => 'images', 'value' => $images],
+        ]);
         echo 1;
+    }
+    private function updateCacheData($page){
+        return $cachedAds = Cache::remember("cached_ads_page_$page", 300, function () use ($page) {
+            $perPage = 16;
+            $offset = ($page - 1) * $perPage;
+            
+            $collection = $this->firestore->collection('ads');
+            $query = $collection->orderBy('adsTitle')->offset($offset)->limit($perPage);
+            $documents = $query->documents();
+            $ads = [];
+            foreach($documents as $adKey => $adData){
+                $adKey = $adData->id();
+
+                $newAdd = new Ad();
+                $newAdd->uid = $adKey;
+                $newAdd->adsTitle = $adData['adsTitle'];
+                $newAdd->category = $adData['category'];
+                $newAdd->brand = $adData['brand'];
+                $newAdd->model = $adData['model'];
+                $newAdd->description = $adData['description'];
+                $newAdd->user = $adData['user'];
+                $newAdd->state = $adData['state'];
+                $newAdd->price = $adData['price'];
+                $newAdd->phoneNumber = $adData['phoneNumber'];
+                $newAdd->dateCreate = $adData['dateCreate'];
+                $newAdd->color = $adData['color'];
+                $newAdd->addons = $adData['addons'];
+                $newAdd->images = $adData['images'];
+                $newAdd->isFavourite = $this->checkFavourite($adKey, FirebaseController::getUserUID());
+                $newAdd->compared = $this->checkCompared($adKey);
+
+                $newAdd['main-image'] = 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/main-image%2F'.$adData['brand'].'%2F' . $adData['model'] .'.jpg?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800';
+                
+                $newAdd['rates'] = $this->getRates($adKey)[0];
+                $newAdd['ratesCount'] = $this->getRates($adKey)[1];
+                $newAdd['creatorUsername'] = $this->getUserUsername($adData['user']);
+                array_push($ads, $newAdd);
+            }
+            return $ads;
+        });
     }
     public function getAdsData(Request $request) {
         $page = $request->input('page');
-        // $this->getLastNumericKey();
-        $cachedAds = Cache::remember("cached_ads_page_$page", 500, function () use ($page) {
-            $perPage = 16;
-            $offset = ($page - 1) * $perPage;
-    
-            $ref = $this->database->getReference('ads')
-                ->orderByKey()
-                ->startAt(strval($offset))
-                ->limitToFirst($perPage + 1)
-                ->getValue();
-
-            $ads = collect($ref)->map(function ($adData, $adKey) {
-                if($adData != null){
-                    $newAdd = new Ad($adData);
-                    $storageBucket = $this->storage->getBucket();
-                    $imageReference = $storageBucket->object('main-image/' . $newAdd['brand'] . '/' . $newAdd['model'] . '.jpg');
-                    try{
-                        $imageContents = $imageReference->downloadAsStream();
-                        $base64Image = base64_encode($imageContents);
-
-                        $newAdd['main-image'] = $base64Image;
-                    }catch(StorageException $e){
-                        $newAdd['main-image'] = 'none';
-                    }
-
-                    $imagesFolderPrefix = 'ads/' . $adKey . '/images/';
-                    try{
-                        $images = [];
-                        $objects = $this->storage->getBucket()->objects(['prefix' => $imagesFolderPrefix]);
-                        foreach ($objects as $object) {
-                            $image = $object->downloadAsString();
-                            $images[] = base64_encode($image);
-                        }
-                        $newAdd['images'] = $images;
-                    }catch(StorageException $e){
-                        $newAdd['images'] = 'none';
-                    }
-                    $newAdd['rates'] = $this->getRates($adKey)[0];
-                    $newAdd['ratesCount'] = $this->getRates($adKey)[1];
-                    $newAdd['creatorUsername'] = $this->getUserUsername($adData['user']);
-                    return $newAdd;
-                }
-            });
-    
-            return $ads;
-        });
-    
+        $cachedAds = $this->updateCacheData($page);
         return response()->json($cachedAds);
     }
-
     public function getRates($adKey2){
-        $ref = $this->database->getReference('rates/' . $adKey2)->getSnapshot();
+        $collection = $this->firestore->collection('rates');
+        $query = $collection->where('ads_uid', '=', $adKey2);
+        $documents = $query->documents();
+
         $ocene = [];
-        if($ref->getValue() == null) return array(0, 0);
-        foreach($ref->getValue() as $korisnikId => $ocena){
-            $ocene[] = $ocena['rate'];
+        foreach($documents as $adKey => $adData){
+            $ocene[] = $adData['rate'];
         }
         $prosecnaOcena = count($ocene) > 0 ? array_sum($ocene) / count($ocene) : 0;
         $result = array($prosecnaOcena, count($ocene));
         return $result;
     }
     public function getUserUsername($userUID){
-        $ref = $this->database->getReference('user')->getValue();
-        return $ref[$userUID]['username'];
+        $collection = $this->firestore->collection('users');
+        $documentReference = $collection->document($userUID);
+        return $documentReference->snapshot()->data()['username'];
+    }
+    public function getSpecificAd(Request $request){
+        $uid = $request->input('ad');
+        $cachedAd = Cache::remember($uid, 500, function () use ($uid){
+            $collection = $this->firestore->collection('ads');
+            $documentReference = $collection->document($uid);
+            $snapshot = $documentReference->snapshot();
+
+            if($snapshot->exists()){
+                $adData = $snapshot->data();
+                #region returnAd
+                $newAdd = new Ad();
+                $newAdd->uid = $uid;
+                $newAdd->adsTitle = $adData['adsTitle'];
+                $newAdd->category = $adData['category'];
+                $newAdd->brand = $adData['brand'];
+                $newAdd->model = $adData['model'];
+                $newAdd->description = $adData['description'];
+                $newAdd->user = $adData['user'];
+                $newAdd->state = $adData['state'];
+                $newAdd->price = $adData['price'];
+                $newAdd->phoneNumber = $adData['phoneNumber'];
+                $newAdd->dateCreate = $adData['dateCreate'];
+                $newAdd->color = $adData['color'];
+                $newAdd->addons = $adData['addons'];
+                $newAdd->images = $adData['images'];
+                $newAdd->visits = $adData['visits'];
+                #endregion
+
+                $newAdd['main-image'] = 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/main-image%2F'.$adData['brand'].'%2F' . $adData['model'] .'.jpg?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800';
+                
+                $newAdd->rates = $this->getRates($uid)[0];
+                $newAdd->ratesCount = $this->getRates($uid)[1];
+                $newAdd->creatorUsername = $this->getUserUsername($adData['user']);
+                return $newAdd;
+            }
+            return null;
+        });
+        return response()->json($cachedAd);
+    }
+    public function addToFavourite(Request $request){
+        $uid = $request->input('uid');
+        try{
+            $uidUser = FirebaseController::getUserUID();
+            $collection = $this->firestore->collection('users');
+            $documentReference = $collection->document($uidUser);
+            $favCollection = $documentReference->collection('favourite');
+
+            if($this->checkFavourite($uid)){
+                $favCollection->document($uid)->delete();
+                $this->updateFavouriteCached($uid, false, 1);
+                return 1;
+            }else{
+                $date = date('d-m-y h:i:s');
+                $favCollection->document($uid)->set([
+                    'dateTime' => $date,
+                ]);
+                $this->updateFavouriteCached($uid, true, 1);
+                return 2;
+            }
+            
+        }catch(\Throwable $e){
+            return $e;
+        }
+    }
+    public function checkFavourite($uid){
+        try{
+            $uidUser = FirebaseController::getUserUID();
+            $collection = $this->firestore->collection('users')
+                            ->document($uidUser)
+                            ->collection('favourite');
+            $documentReference = $collection->document($uid);
+            $documentSnapshot = $documentReference->snapshot();
+            return $documentSnapshot->exists();
+        }catch(\Throwable $e){
+            return false;
+        }
+    }
+    private function updateFavouriteCached($uid, $fav, $page){
+        $cacheName = "cached_ads_page_$page";
+        if(Cache::has($cacheName)){
+            $cachedAds = Cache::get($cacheName);
+            foreach ($cachedAds as &$ad) {
+                if ($ad->uid === $uid) {
+                    $ad->isFavourite = $fav;
+                }
+            }
+            Cache::put("cached_ads_page_$page", $cachedAds, 300);
+        }
+    }
+    private function updateCompareCached($uid, $compare, $page){
+        $cacheName = "cached_ads_page_$page";
+        if(Cache::has($cacheName)){
+            $cachedAds = Cache::get($cacheName);
+            foreach ($cachedAds as &$ad) {
+                if ($ad->uid === $uid) {
+                    $ad->compared = $compare;
+                }
+            }
+            Cache::put("cached_ads_page_$page", $cachedAds, 300);
+        }
+    }
+    private function checkCompared($uid){
+        try{
+            $uidUser = FirebaseController::getUserUID();
+            $collection = $this->firestore->collection('users')
+                            ->document($uidUser)
+                            ->collection('compare');
+            $documentReference = $collection->document($uid);
+            $documentSnapshot = $documentReference->snapshot();
+            return $documentSnapshot->exists();
+        }catch(\Throwable $e){
+            return false;
+        }
+    }
+    public function countCompared(){
+        try{
+            $uidUser = FirebaseController::getUserUID();
+            $collection = $this->firestore->collection('users')
+                            ->document($uidUser)
+                            ->collection('compare');
+            $querySnapshot = $collection->documents();
+            $countDocument = $querySnapshot->size();
+            if($countDocument < 4){
+                return true;
+            }
+            return false;
+        }catch(\Throwable $e){
+            return false;
+        }
+    }
+    public function addToCompare(Request $request){
+        $uid = $request->input('uid');
+        try{
+            $uidUser = FirebaseController::getUserUID();
+            $collection = $this->firestore->collection('users');
+            $documentReference = $collection->document($uidUser);
+            $favCollection = $documentReference->collection('compare');
+
+            if($this->checkCompared($uid)){
+                $favCollection->document($uid)->delete();
+                $this->updateCompareCached($uid, false, 1);
+                return 1;
+            }else{
+                if($this->countCompared()){
+                    $date = date('d-m-y h:i:s');
+                    $favCollection->document($uid)->set([
+                        'dateTime' => $date,
+                    ]);
+                    $this->updateCompareCached($uid, true, 1);
+                    return 2;
+                }else{
+                    return 3;
+                }
+            }
+            
+        }catch(\Throwable $e){
+            return $e;
+        }
     }
 }

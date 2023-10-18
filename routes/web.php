@@ -24,14 +24,18 @@ Route::post('/getAds', [FirebaseController::class, 'getAdsData'])->name('get-ads
 
 Route::get('/mydata', [FirebaseController::class, 'getMyData']);
 
+Route::post('/getSpecificAd', [FirebaseController::class, 'getSpecificAd'])->name('get-specific-ad');
+
 Route::get('/login-register', [LoginRegisterController::class, 'index'])
     ->name('login-register')
     ->middleware('loginRegisterAuth');
 
-Route::get('/models', [WelcomeController::class, 'getModels']);
+Route::get('/models/{model}', [WelcomeController::class, 'getModels']);
+Route::get('/getLast', [FirebaseController::class, 'getLastNumericKey']);
 // Route::get('/rates', [FirebaseController::class, 'getRates']);
 
 Route::get('/quick-view', [QuickViewController::class, 'index']);
+Route::get('/wishlist', [MyAccountController::class, 'wishlist'])->name('wishlist');
 
 Route::middleware(['firebaseAuth'])->group(function () {
     // Zasticene stranice
@@ -46,5 +50,7 @@ Route::middleware(['firebaseAuth'])->group(function () {
     Route::get('my-account/add-new-ads/mobilePhoneMainImage', [FirebaseController::class, 'mobilePhoneMainImage'])->name('mobilePhoneMainImage');
     Route::get('my-account/userData', [UserDataNotification::class, 'index'])->name('user-data-notification');
     Route::post('/user/addNewAds', [FirebaseController::class, 'addNewAds'])->name('addNewAds');
+    Route::post('/user/addToFavourite', [FirebaseController::class, 'addToFavourite'])->name('addToFavourite');
+    Route::post('/user/addToCompare', [FirebaseController::class, 'addToCompare'])->name('addToCompare');
+    Route::get('/user/countCompared', [FirebaseController::class, 'countCompared'])->name('countCompared');
 });
-

@@ -1,0 +1,32 @@
+@import url('variables.css');
+
+.card-alert {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 100%;
+    max-width: 400px;
+    background-color: var(--green-button);
+    border-radius: 10px;
+    padding: 15px 0px;
+    color: white;
+    font-size: 0.9rem;
+    z-index: 1001;
+    display: none;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.card-alert .close {
+    cursor: pointer;
+    text-align: end;
+}
+
+.card-alert .close:hover {
+    font-weight: bold;
+}
+
+.card-alert a {
+    color: white;
+    font-weight: bold;
+}

@@ -1,8 +1,9 @@
 function createWidget(data, i) {
 
     var productData = {
+        uid: data['uid'],
         imageUrl: data['main-image'],
-        title: data['adsTitle'],
+        title: (data['adsTitle'].length >= 50) ? data['adsTitle'].substring(0, 50) + '...' : data['adsTitle'],
         rating: data['rates'],
         ratingCount: data['ratesCount'],
         oldPrice: "100.00",
@@ -11,7 +12,9 @@ function createWidget(data, i) {
         model: data['model'],
         description: data['description'].replace(/<[^>]*>/g, "").substring(0, 100) + '...',
         images: data['images'],
-        username: data['creatorUsername']
+        username: data['creatorUsername'],
+        isFavourite: data['isFavourite'],
+        isCompared: data['compared'],
     };
 
     var productHtml = `
@@ -37,15 +40,15 @@ function createWidget(data, i) {
                                 <div data-hover-slider-i="4" class="hover-slider-indicator-dot"></div>
                                 <div data-hover-slider-i="5" class="hover-slider-indicator-dot"></div>
                             </div>
-                            <img src="data:image/jpeg;base64,${productData.imageUrl}" alt="" class="main-image d-none default-image">
-                            <img src="data:image/jpeg;base64,${productData.imageUrl}" alt="" class="main-image">
+                            <img src="${productData.imageUrl}" alt="" class="main-image d-none default-image">
+                            <img src="${productData.imageUrl}" alt="" class="main-image">
                         </div>
                     </a>
                     <div class="product-buttons">
-                        <a href="" class="wishlist klbwl-btn"></a>
+                        <a href="#" id="wishlist_${i}" class="wishlist klbwl-btn ${productData.isFavourite ? 'favourite' : 'not'}"></a>
                         <a href="" class="mostcomments"></a>
-                        <a href="" class="klbcp-btn klbcp-btn-521"></a>
-                        <a class="detail-bnt quickview animated" style="cursor: pointer;" onclick="showQuickView()"></a>
+                        <a href="" id="compare_${i}" class="klbcp-btn klbcp-btn-521 ${productData.isCompared ? 'compare' : 'not'}"></a>
+                        <a class="detail-bnt quickview animated" style="cursor: pointer;" onclick="showQuickView('${productData.uid}')"></a>
                     </div>
                 </div>
                 <div class="content-wrapper">
@@ -76,7 +79,7 @@ function createWidget(data, i) {
                                     </span>
                                 </ins>
                             </span>
-                            <a href="" data-quantity="1" class="button product-type-simple add-to-cart-button ajax-add-to-cart">
+                            <a href="" data-quantity="1" id="cart_${i}" class="button product-type-simple add-to-cart-button ajax-add-to-cart">
                                 <i class="fa-solid fa-cart-plus"></i>
                             </a>
                         </div>

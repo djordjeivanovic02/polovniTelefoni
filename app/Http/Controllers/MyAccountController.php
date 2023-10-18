@@ -19,4 +19,7 @@ class MyAccountController extends Controller
     public function addNewAds(){
         return view('add-new-ads');
     }
+    public function wishlist(){
+        return view('wishlist');
+    }
 }

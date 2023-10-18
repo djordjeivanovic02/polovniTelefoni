@@ -1,0 +1,82 @@
+@import url('variables.css');
+
+.wishlist-alert {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--popup-background);
+    z-index: 100000;
+}
+
+.wishlist-alert .wishlist-alert-bellow {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.wishlist-alert .main-container {
+    background-color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    max-height: 100%;
+    transition: all 0.5s;
+    transform: translate3d(-50%, -50%, 0);
+    padding: 40px;
+}
+
+.wishlist-alert .main-container p {
+    text-align: center;
+}
+
+.wishlist-alert .main-container button {
+    width: 100%;
+    height: 45px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--button-blue-color);
+    color: white;
+    font-weight: bold;
+    transition-duration: 0.5s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wishlist-alert .main-container button:hover {
+    background-color: var(--button-blue-color-hover);
+}
+
+.wishlist-alert .main-container button p {
+    margin: 0;
+}
+
+.wishlist-alert .main-container .favourite p::before {
+    content: '\2661';
+    margin-right: 5px;
+    font-weight: normal;
+}
+
+.wishlist-alert .main-container .compared p::before {
+    content: '\2261';
+    margin-right: 5px;
+    font-weight: normal;
+}
+
+.wishlist-alert .main-container button.close {
+    margin-top: 10px;
+}
+
+.wishlist-alert .main-container button.close p::before {
+    content: 'X';
+    margin-right: 10px;
+    font-weight: normal;
+}

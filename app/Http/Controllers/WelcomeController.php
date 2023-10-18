@@ -9,7 +9,7 @@ class WelcomeController extends Controller
     public function index(){
         return view('welcome');
     }
-    public function getModels($brand){
-        return view('mobile-phones/'.$brand.'-models');
+    public function getModels($model){
+        return view('mobile-phones/apple-models');
     }
 }

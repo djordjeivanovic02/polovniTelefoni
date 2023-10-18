@@ -168,7 +168,6 @@
             url: "{{ route('login') }}",
             data: formData,
             success: function(response){
-                //alert(response);
                 switch(response){
                     case '1':
                         window.location.replace('');
@@ -304,7 +303,6 @@
                 url: "{{ route('register') }}",
                 data: formData,
                 success: function(response){
-                    //alert(response);
                     loader.style.display = 'none';
                     switch(response){
                         case "1":

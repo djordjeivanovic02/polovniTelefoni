@@ -953,6 +953,33 @@ a.klbwl-btn::before {
     color: var(--font-color);
 }
 
+.klbwl-btn.active::before {
+    content: "";
+    display: block;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    border-top: 4px solid var(--button-blue-color);
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+a.klbwl-btn.favourite::before {
+    font-size: 1.1rem;
+    content: "\2764";
+    color: var(--main-hover-color);
+}
+
 .thumbnail-wrapper a {
     text-decoration: none;
 }
@@ -982,6 +1009,17 @@ a.klbcp-btn {
     position: relative;
 }
 
+a.klbcp-btn.active::before {
+    content: "";
+    display: block;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    border-top: 4px solid var(--button-blue-color);
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+}
+
 .product-buttons>*+* {
     margin-top: 5px;
 }
@@ -999,6 +1037,22 @@ a.klbcp-btn::before {
     line-height: 1em;
     margin-left: 0.2em;
     content: "\2261";
+    font-size: 0.875rem;
+}
+
+a.klbcp-btn.compare::before {
+    font-style: normal;
+    font-weight: normal;
+    display: inline-block;
+    text-decoration: inherit;
+    width: 1em;
+    margin-right: 0.2em;
+    text-align: center;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1em;
+    margin-left: 0.2em;
+    content: "\2713";
     font-size: 0.875rem;
 }
 
