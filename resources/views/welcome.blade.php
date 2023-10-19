@@ -738,11 +738,12 @@
 
 <script src="{{ asset('js/ads-widget.js') }}"></script>
 <script>
-    function showQuickView(uid){
+    function showQuickView(uid, el){
+        el.classList.toggle('animated');
         document.getElementById('link1').href = "{{ asset('css/quick-preview-style.css') }}";
         document.getElementsByClassName('quick-view2')[0].style.display = 'block';
 
-        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+        const csrfToken = $('meta[name="csrf-token"]').attr('content');
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': csrfToken
@@ -755,6 +756,7 @@
                 'ad': uid,
             },
             success: function(response){
+                el.classList.toggle('animated');
                 document.getElementById('qv-product-title').innerHTML = response['adsTitle'];
                 document.getElementById('qv-product-brand').innerHTML = response['brand'];
                 document.getElementById('qv-product-model').innerHTML = response['model'];
@@ -911,6 +913,11 @@
                             var adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
 
                             if(userExist === 'true'){
+                                if($(this).hasClass('disabled')){
+                                    return;
+                                }
+                                $(this).addClass('disabled');
+                                const element = this;
                                 this.classList.remove('favourite');
                                 this.classList.remove('not');
                                 this.classList.toggle('active');
@@ -939,6 +946,7 @@
                                             element.classList.remove('favourite');
                                             element.classList.add('not');
                                         }
+                                        $(element).removeClass('disabled');
                                     }
                                 });
                             }else{
@@ -954,6 +962,11 @@
                             var btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
 
                             if(userExist === 'true'){
+                                if($(this).hasClass('disabled')){
+                                    return;
+                                }
+                                $(this).addClass('disabled');
+                                const element = this;
                                 this.classList.remove('compare');
                                 this.classList.toggle('active');
                                 const newI = this.id.split('_')[1];
@@ -981,6 +994,7 @@
                                         }else if(res === '3'){
                                             console.log('Vec imate maksimalan broj uredjaj koje mozete uporediti.');
                                         }
+                                        $(element).removeClass('disabled');
                                     }
                                 });
                             }else{
@@ -990,8 +1004,11 @@
                         $("#cart_"+i).click(async function(e){
                             e.preventDefault();
                             if(userExist === 'true'){
-                                $(this).off('click');
-                                console.log('disabled');
+                                if($(this).hasClass('disabled')){
+                                    return;
+                                }
+                                $(this).addClass('disabled');
+                                const element = this;
                                 const addToCart = this.querySelector('i');
                                 addToCart.classList.toggle('active');
                                 const newI = this.id.split('_')[1];
@@ -1020,8 +1037,8 @@
                                         }else if(res === '1'){
                                             addToCart.classList.remove('fa-check');
                                             addToCart.classList.add('fa-cart-plus');
-                                            $(this).on('click');
                                         }
+                                        $(element).removeClass('disabled');
                                     }
                                 });
                             }

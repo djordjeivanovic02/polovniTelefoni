@@ -49,7 +49,7 @@ function createWidget(data, i) {
                         <a href="#" id="wishlist_${i}" class="wishlist klbwl-btn ${productData.isFavourite ? 'favourite' : 'not'}"></a>
                         <a href="" class="mostcomments"></a>
                         <a href="" id="compare_${i}" class="klbcp-btn klbcp-btn-521 ${productData.isCompared ? 'compare' : 'not'}"></a>
-                        <a class="detail-bnt quickview animated" style="cursor: pointer;" onclick="showQuickView('${productData.uid}')"></a>
+                        <a class="detail-bnt quickview" style="cursor: pointer;" onclick="showQuickView('${productData.uid}', this)"></a>
                     </div>
                 </div>
                 <div class="content-wrapper">

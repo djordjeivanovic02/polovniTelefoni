@@ -439,13 +439,14 @@ class FirebaseController extends Controller
                 $newAdd->images = $adData['images'];
                 $newAdd->isFavourite = $this->checkFavourite($adKey, FirebaseController::getUserUID());
                 $newAdd->compared = $this->checkCompared($adKey);
+                $newAdd->cart = $this->checkCart($adKey);
 
                 $newAdd['main-image'] = 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/main-image%2F'.$adData['brand'].'%2F' . $adData['model'] .'.jpg?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800';
 
                 $newAdd['rates'] = $this->getRates($adKey)[0];
                 $newAdd['ratesCount'] = $this->getRates($adKey)[1];
                 $newAdd['creatorUsername'] = $this->getUserUsername($adData['user']);
-                array_push($ads, $newAdd);
+                $ads[] = $newAdd;
             }
             return $ads;
         });
@@ -499,7 +500,7 @@ class FirebaseController extends Controller
                 $newAdd->addons = $adData['addons'];
                 $newAdd->images = $adData['images'];
                 $newAdd->visits = $adData['visits'];
-                $newAdd->cart = $adData['cart'];
+                //$newAdd->cart = $adData['cart'];
                 #endregion
 
                 $newAdd['main-image'] = 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/main-image%2F'.$adData['brand'].'%2F' . $adData['model'] .'.jpg?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800';

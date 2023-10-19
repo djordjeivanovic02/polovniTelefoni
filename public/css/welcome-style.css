@@ -1083,6 +1083,16 @@ a.detail-bnt::before {
     content: "\1F441";
     font-size: 0.875rem;
 }
+a.detail-bnt.animated::before{
+    content: "";
+    display: block;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    border-top: 4px solid var(--button-blue-color);
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+}
 
 div.product-content:hover .product-buttons>.klbcp-btn,
 div.product-content:hover .product-buttons>.detail-bnt {
