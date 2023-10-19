@@ -979,6 +979,9 @@ a.klbwl-btn.favourite::before {
     content: "\2764";
     color: var(--main-hover-color);
 }
+.add-to-cart-button i.fa-check{
+    color: var(--green-button);
+}
 
 .thumbnail-wrapper a {
     text-decoration: none;
@@ -1023,7 +1026,16 @@ a.klbcp-btn.active::before {
 .product-buttons>*+* {
     margin-top: 5px;
 }
-
+.add-to-cart-button i.active::before{
+    content: "";
+    display: block;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    border-top: 4px solid var(--button-blue-color);
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+}
 a.klbcp-btn::before {
     font-style: normal;
     font-weight: normal;

@@ -52,5 +52,6 @@ Route::middleware(['firebaseAuth'])->group(function () {
     Route::post('/user/addNewAds', [FirebaseController::class, 'addNewAds'])->name('addNewAds');
     Route::post('/user/addToFavourite', [FirebaseController::class, 'addToFavourite'])->name('addToFavourite');
     Route::post('/user/addToCompare', [FirebaseController::class, 'addToCompare'])->name('addToCompare');
-    Route::get('/user/countCompared', [FirebaseController::class, 'countCompared'])->name('countCompared');
+    //Route::get('/user/countCompared', [FirebaseController::class, 'countCompared'])->name('countCompared');
+    Route::post('user/addToCart', [FirebaseController::class, 'addToCart'])->name('addToCart');
 });

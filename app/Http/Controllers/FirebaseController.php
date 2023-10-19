@@ -50,10 +50,10 @@ class FirebaseController extends Controller
     }
     public function checkEmailAvailability($email){
         $databaseRef = $this->database->getReference('subscriber');
-    
+
         $query = $databaseRef->orderByChild('email')->equalTo($email);
         $snapshot = $query->getValue();
-    
+
         if ($snapshot) return false; // username je zauzet
         else return true; // username je slobodan
     }
@@ -65,7 +65,7 @@ class FirebaseController extends Controller
             return 1;
         } catch (InvalidEmail $e) {
             return 4; // Pogresna email adresa
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             return $e->getMessage(); // Greska pri slanju
         }
     }
@@ -90,18 +90,15 @@ class FirebaseController extends Controller
             $documentReference->set($data);
             $this->auth->sendEmailVerificationLink($email);
             return 1;
-        }catch(\Throwable $e){
-            return $e->getMessage();
+        }catch(\Exception $e){
             switch ($e->getMessage()) {
                 case 'The email address is already in use by another account.':
                     return 2;
                     break;
                 case 'A password must be a string with at least 6 characters.':
                     return 3;
-                    break;
                 default:
                     return 5;
-                    break;
             }
         }
     }
@@ -115,7 +112,7 @@ class FirebaseController extends Controller
 
             if ($verifiedIdToken->claims()->has('email_verified')) {
                 if ($verifiedIdToken->claims()->get('email_verified')) {
-                
+
                     $uid = $verifiedIdToken->claims()->get('sub');
                     FirebaseController::getMyData($uid, $email);
                     Session::put('firebaseUserId', $signInResult->firebaseUserId());
@@ -130,8 +127,7 @@ class FirebaseController extends Controller
             } else {
                 return 5; // Or handle the case as needed
             }
-        }catch(\Throwable $e){
-            return $e->getMessage();
+        }catch(\Exception $e){
             switch ($e->getMessage()) {
                 case 'INVALID_PASSWORD':
                     //echo "Pogresna lozinka.";
@@ -157,7 +153,7 @@ class FirebaseController extends Controller
         try {
             $this->auth->sendPasswordResetLink($email);
             echo 1;
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             switch ($e->getMessage()) {
                 case 'EMAIL_NOT_FOUND':
                     //return response()->json(['error' => 'Email adresa nije pronađena.']);
@@ -196,7 +192,7 @@ class FirebaseController extends Controller
             //dump($verifiedIdToken->claims()->get('sub'));//uid
             //dump($this->auth->getUser($verifiedIdToken->claims()->get('sub')));
             return true;
-        }catch(\Throwable $e){
+        }catch(\Exception $e){
             //echo $e->getMessage();
             return false;
         }
@@ -210,10 +206,10 @@ class FirebaseController extends Controller
         if($snapshot->exists()){
             $documentData = $snapshot->data();
             $user = new UserModel(
-                $email,  
+                $email,
                 $documentData["username"],
                 $documentData["first-name"],
-                $documentData["second-name"],
+                $documentData["second-name"]
             );
             Session::put('user', $user);
             Session::save();
@@ -251,7 +247,7 @@ class FirebaseController extends Controller
             $snapshot = $documentReference->snapshot();
 
             if($userData->getUsername() != $username && !$this->checkUsernameAvailability($username)) return 2;
-            
+
             if($snapshot->exists()){
                 $documentData = $snapshot->data();
                 $documentData['first-name'] = $firstName;
@@ -266,7 +262,7 @@ class FirebaseController extends Controller
             // $firebaseUser->updatePassword($new_password);
 
             return 1;
-        }catch(\Throwable $e){
+        }catch(\Exception $e){
             return $e;
         }
     }
@@ -284,7 +280,7 @@ class FirebaseController extends Controller
                 return 1;
             }else return 2;
             return 3;
-        }catch(\Throwable $e){
+        }catch(\Exception $e){
             return $e;
         }
     }
@@ -418,7 +414,7 @@ class FirebaseController extends Controller
         return $cachedAds = Cache::remember("cached_ads_page_$page", 300, function () use ($page) {
             $perPage = 16;
             $offset = ($page - 1) * $perPage;
-            
+
             $collection = $this->firestore->collection('ads');
             $query = $collection->orderBy('adsTitle')->offset($offset)->limit($perPage);
             $documents = $query->documents();
@@ -445,7 +441,7 @@ class FirebaseController extends Controller
                 $newAdd->compared = $this->checkCompared($adKey);
 
                 $newAdd['main-image'] = 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/main-image%2F'.$adData['brand'].'%2F' . $adData['model'] .'.jpg?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800';
-                
+
                 $newAdd['rates'] = $this->getRates($adKey)[0];
                 $newAdd['ratesCount'] = $this->getRates($adKey)[1];
                 $newAdd['creatorUsername'] = $this->getUserUsername($adData['user']);
@@ -503,10 +499,11 @@ class FirebaseController extends Controller
                 $newAdd->addons = $adData['addons'];
                 $newAdd->images = $adData['images'];
                 $newAdd->visits = $adData['visits'];
+                $newAdd->cart = $adData['cart'];
                 #endregion
 
                 $newAdd['main-image'] = 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/main-image%2F'.$adData['brand'].'%2F' . $adData['model'] .'.jpg?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800';
-                
+
                 $newAdd->rates = $this->getRates($uid)[0];
                 $newAdd->ratesCount = $this->getRates($uid)[1];
                 $newAdd->creatorUsername = $this->getUserUsername($adData['user']);
@@ -536,8 +533,8 @@ class FirebaseController extends Controller
                 $this->updateFavouriteCached($uid, true, 1);
                 return 2;
             }
-            
-        }catch(\Throwable $e){
+
+        }catch(\Exception $e){
             return $e;
         }
     }
@@ -550,7 +547,7 @@ class FirebaseController extends Controller
             $documentReference = $collection->document($uid);
             $documentSnapshot = $documentReference->snapshot();
             return $documentSnapshot->exists();
-        }catch(\Throwable $e){
+        }catch(\Exception $e){
             return false;
         }
     }
@@ -578,6 +575,18 @@ class FirebaseController extends Controller
             Cache::put("cached_ads_page_$page", $cachedAds, 300);
         }
     }
+    private function updateCartCached($uid, $cart, $page){
+        $cacheName = "cached_ads_page_$page";
+        if(Cache::has($cacheName)){
+            $cachedAds = Cache::get($cacheName);
+            foreach ($cachedAds as &$ad) {
+                if ($ad->uid === $uid) {
+                    $ad->cart = $cart;
+                }
+            }
+            Cache::put("cached_ads_page_$page", $cachedAds, 300);
+        }
+    }
     private function checkCompared($uid){
         try{
             $uidUser = FirebaseController::getUserUID();
@@ -587,7 +596,7 @@ class FirebaseController extends Controller
             $documentReference = $collection->document($uid);
             $documentSnapshot = $documentReference->snapshot();
             return $documentSnapshot->exists();
-        }catch(\Throwable $e){
+        }catch(\Exception $e){
             return false;
         }
     }
@@ -603,7 +612,7 @@ class FirebaseController extends Controller
                 return true;
             }
             return false;
-        }catch(\Throwable $e){
+        }catch(\Exception $e){
             return false;
         }
     }
@@ -631,9 +640,45 @@ class FirebaseController extends Controller
                     return 3;
                 }
             }
-            
-        }catch(\Throwable $e){
+
+        }catch(\Exception $e){
             return $e;
+        }
+    }
+    public function addToCart(Request $request){
+        $uid = $request->input('uid');
+        try {
+            $uidUser = FirebaseController::getUserUID();
+            $collection = $this->firestore->collection('users');
+            $documentReference = $collection->document($uidUser);
+            $cartCollection = $documentReference->collection('cart');
+            if($this->checkCart($uid)){
+                $cartCollection->document($uid)->delete();
+                $this->updateCartCached($uid, false, 1);
+                return 1;
+            }else{
+                $date = date('d-m-y h:i:s');
+                $cartCollection->document($uid)->set([
+                   'dateTime' => $date,
+                ]);
+                $this->updateCartCached($uid, true, 1);
+                return 2;
+            }
+        }catch (\Exception $e){
+            return $e;
+        }
+    }
+    private function checkCart($uid){
+        try{
+            $uidUser = FirebaseController::getUserUID();
+            $collection = $this->firestore->collection('users')
+                ->document($uidUser)
+                ->collection('cart');
+            $documentReference = $collection->document($uid);
+            $documentSnapshot = $documentReference->snapshot();
+            return $documentSnapshot->exists();
+        }catch(\Exception $e){
+            return false;
         }
     }
 }

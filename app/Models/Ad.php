@@ -13,6 +13,6 @@ class Ad extends Model
         'uid', 'adsTitle', 'category', 'brand', 'model', 'description',
         'user', 'state', 'price', 'phoneNumber', 'dateCreate',
         'color', 'addons', 'main-image', 'images', 'rates', 'ratesCount',
-        'creatorUsername', 'visits', 'isFavourite', 'compared',
+        'creatorUsername', 'visits', 'isFavourite', 'compared', 'cart',
     ];
 }

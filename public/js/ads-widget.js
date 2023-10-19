@@ -1,6 +1,6 @@
 function createWidget(data, i) {
 
-    var productData = {
+    const productData = {
         uid: data['uid'],
         imageUrl: data['main-image'],
         title: (data['adsTitle'].length >= 50) ? data['adsTitle'].substring(0, 50) + '...' : data['adsTitle'],
@@ -15,9 +15,10 @@ function createWidget(data, i) {
         username: data['creatorUsername'],
         isFavourite: data['isFavourite'],
         isCompared: data['compared'],
+        isCart: data['cart'],
     };
 
-    var productHtml = `
+    const productHtml = `
         <div class="product-wrapper product-type-1">
             <div class="product-content">
                 <div class="thumbnail-wrapper">
@@ -79,8 +80,8 @@ function createWidget(data, i) {
                                     </span>
                                 </ins>
                             </span>
-                            <a href="" data-quantity="1" id="cart_${i}" class="button product-type-simple add-to-cart-button ajax-add-to-cart">
-                                <i class="fa-solid fa-cart-plus"></i>
+                            <a data-quantity="1" id="cart_${i}" class="button product-type-simple add-to-cart-button ajax-add-to-cart">
+                                <i class="fa-solid ${productData.isCart ? 'fa-check' : 'fa-cart-plus'}"></i>
                             </a>
                         </div>
                         <div class="product-meta">

@@ -207,12 +207,12 @@
                 </div>
                 <div class="row d-flex flex-row-reverse content-wrapper sidebar-left">
                     <!-- Prikaz oglasa! -->
-                    <div class="col col-12 col-lg-9 content-primary"> 
+                    <div class="col col-12 col-lg-9 content-primary">
                         <div id="loading-form-screen" style="display: flex;" class="h-100 position-relative align-items-start justify-content-center">
                             <div class="custom-loader"></div>
                         </div>
                         <div class="products column-4 mobile-2 m-0 p-0 list-unstyled">
-                            
+
                         </div>
                     </div>
                     <div id="sidebar" class="col col-12 col-lg-3 content-secondary site-sidebar filtered-sidebar">
@@ -551,8 +551,8 @@
                                     </ul>
                                 </div>
                                 <div class="widget widget-media-image">
-                                    <img src="{{ asset('images/widget-banner.jpg') }}" 
-                                        alt="" 
+                                    <img src="{{ asset('images/widget-banner.jpg') }}"
+                                        alt=""
                                         class="image wp-image-2119 attachment-full size-full"
                                         loading="lazy"
                                         decoding="async">
@@ -584,7 +584,7 @@
                                         <div class="woocommerce-product-gallery">
                                             <div class="image-wrapper">
                                                 <div id="product-images" class="swiper-container swiper-container-initialized swiper-container-horizontal swiper-container-pointer-events swiper-container-autoheight slider-loaded"
-                                                data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d" 
+                                                data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d"
                                                 data-spacebetween="0" data-autoplay="false" data-autospeed="300" data-items="1" data-mobileItems="1" data-tabletItems="1">
                                                     <div class="swiper-wrapper" style="height:455px; transform: translate3d(0px, 0px, 0px)" id="swiper-wrapper-1" aria-live="polite">
                                                     </div>
@@ -594,52 +594,9 @@
                                             </div>
                                             <div class="thumbnails-wrapper">
                                                 <div id="product-thumbnails" class="swiper-container swiper-container-initialized swiper-container-horizontal swiper-container-pointer-events swiper-container-free-mode swiper-container-thumbs slider-loaded" data-efect="slide"
-                                                    data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d" 
+                                                    data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d"
                                                     data-spacebetween="0" data-autoplay="false" data-autospeed="300" data-items="1" data-mobileItems="1" data-tabletItems="1">
-                                                    <div class="swiper-wrapper swiper-wrapper2">
-                                                        <!-- <div class="swiper-slide swiper-slide-visible swiper-slide-thumb-active"
-                                                            style="width: 85.5px; margin-right: 7px;" role="group" aria-label="1 / 8">
-                                                            <a href="#">
-                                                                <img src="{{ asset('images/phones3.jpg') }}" alt="">
-                                                            </a>
-                                                        </div>
-                                                        <div class="swiper-slide swiper-slide-visible swiper-slide-next"
-                                                            style="width: 85.5px; margin-right: 7px;" role="group" aria-label="2 / 8">
-                                                            <a href="">
-                                                                <img src="{{ asset('images/phones2.jpg') }}" alt="">
-                                                            </a>
-                                                        </div>
-                                                        <div class="swiper-slide swiper-slide-visible swiper-slide-next"
-                                                            style="width: 85.5px; margin-right: 7px;" role="group" aria-label="3 / 8">
-                                                            <a href="">
-                                                                <img src="{{ asset('images/phones4.jpg') }}" alt="">
-                                                            </a>
-                                                        </div>
-                                                        <div class="swiper-slide swiper-slide-visible swiper-slide-next"
-                                                            style="width: 85.5px; margin-right: 7px;" role="group" aria-label="4 / 8">
-                                                            <a href="">
-                                                                <img src="{{ asset('images/phones.jpg') }}" alt="">
-                                                            </a>
-                                                        </div>
-                                                        <div class="swiper-slide swiper-slide-visible swiper-slide-next"
-                                                            style="width: 85.5px; margin-right: 7px;" role="group" aria-label="5 / 8">
-                                                            <a href="">
-                                                                <img src="{{ asset('images/phones3.jpg') }}" alt="">
-                                                            </a>
-                                                        </div>
-                                                        <div class="swiper-slide swiper-slide-visible swiper-slide-next"
-                                                            style="width: 85.5px; margin-right: 7px;" role="group" aria-label="6 / 8">
-                                                            <a href="">
-                                                                <img src="{{ asset('images/phones3.jpg') }}" alt="">
-                                                            </a>
-                                                        </div>
-                                                        <div class="swiper-slide swiper-slide-visible swiper-slide-next"
-                                                            style="width: 85.5px; margin-right: 7px;" role="group" aria-label="7 / 8">
-                                                            <a href="">
-                                                                <img src="{{ asset('images/phones3.jpg') }}" alt="">
-                                                            </a>
-                                                        </div> -->
-                                                    </div>
+                                                    <div class="swiper-wrapper swiper-wrapper2"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -732,8 +689,8 @@
                                     </div>
                                     <div class="product-meta product-categories">
                                         <span class="posted-in">
-                                            Kategorije: 
-                                            <a href="#">Mobilni Telefoni</a>, 
+                                            Kategorije:
+                                            <a href="#">Mobilni Telefoni</a>,
                                             <a href="#">Apple</a>
                                         </span>
                                     </div>
@@ -771,7 +728,7 @@
                 <p class="m-0 p-0">"<span id="ads-title">Apple iPhone 11 Pro Max </span>" je dodat u tvoju korpu.</p>
                 <a href="#">Pogledaj korpu</a>
             </div>
-            <div class="col-1 close">
+            <div class="col-1 close" onclick='document.getElementsByClassName("card-alert")[0].style="none"'>
                 x
             </div>
         </div>
@@ -795,16 +752,16 @@
             method: 'POST',
             url: "{{ route('get-specific-ad') }}",
             data:{
-                'ad': uid, 
+                'ad': uid,
             },
             success: function(response){
                 document.getElementById('qv-product-title').innerHTML = response['adsTitle'];
                 document.getElementById('qv-product-brand').innerHTML = response['brand'];
                 document.getElementById('qv-product-model').innerHTML = response['model'];
                 document.getElementById('qv-star-rating').style.width = response['rates'] * 20 + '%';
-                document.getElementById('qv-views').innerHTML = (response['visits'] != 1) ? response['visits'] + ' Pregleda' : '1 Pregled';
+                document.getElementById('qv-views').innerHTML = (response['visits'] !== 1) ? response['visits'] + ' Pregleda' : '1 Pregled';
                 document.getElementById('qv-current-price').innerHTML = '€' + response['price'];
-            
+
                 var cont1 = document.querySelector('#product-images .swiper-wrapper');
                 var smallCont1 = document.querySelector('#product-thumbnails .swiper-wrapper2');
                 var images = response['images'];
@@ -819,7 +776,7 @@
 
                     var div2 = document.createElement('div');
                     div2.classList.add('swiper-slide', 'swiper-slide-visible');
-                    if(i == 0){
+                    if(i === 0){
                         div2.classList.add('swiper-slide-thumb-active');
                     }else{
                         div2.classList.add('swiper-slide-next');
@@ -869,7 +826,7 @@
             prevEl: '.swiper-button-prev',
         },
     });
-    
+
     swiper.on('slideChange', function(){
         var index = 0;
         var thumbnailSlides = document.querySelectorAll('.swiper-wrapper2 .swiper-slide');
@@ -917,13 +874,14 @@
             if(response != null){
                 document.querySelector('#loading-form-screen').style.display = 'none';
                 var mainDiv = document.querySelector('.products');
-                if(response !== null && response.length > 0){
+                if(response.length > 0){
                     for(var i = 0; i < response.length; i++){
                         var temp = document.createElement('div');
                         temp.classList.add('product', 'status-publish', 'first', 'instock', 'product-cat-apple', 'product-cat-cell-phones', 'has-post-thumbnail', 'sale', 'feautured', 'shipping-taxable', 'purchasable', 'product-type-simple', 'custom-hover');
                         temp.innerHTML = createWidget(response[i], i);
-                        
+
                         mainDiv.appendChild(temp);
+                        const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
 
                         $(".hover-slider-toggle-panel").hover(
                             function() {
@@ -934,28 +892,28 @@
 
                                 var newImage = new Image();
                                 newImage.src = imageUrl;
-                                
+
                                 newImage.onload = function() {
                                     mainImage.attr("src", imageUrl);
                                     productCard.find(".hover-slider-indicator-dot").removeClass("active");
-                                    productCard.find(".hover-slider-indicator-dot[data-hover-slider-i='" + i + "']").addClass("active");                                    
+                                    productCard.find(".hover-slider-indicator-dot[data-hover-slider-i='" + i + "']").addClass("active");
                                 };
                             }
                         );
                         $("#wishlist_"+i).click(async function(e){
                             e.preventDefault();
-                            this.classList.remove('favourite');
-                            this.classList.remove('not');
-                            this.classList.toggle('active');
+
                             this.disabled = true;
                             var element = this;
                             var adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
                             var btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
                             var btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
                             var adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
-                            
-                            var userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
-                            if(userExist == 'true'){
+
+                            if(userExist === 'true'){
+                                this.classList.remove('favourite');
+                                this.classList.remove('not');
+                                this.classList.toggle('active');
                                 const newI = this.id.split('_')[1];
                                 await $.ajax({
                                     method: 'POST',
@@ -989,16 +947,15 @@
                         });
                         $("#compare_"+i).click(async function(e){
                             e.preventDefault();
-                            this.classList.remove('compare');
-                            this.classList.toggle('active');
                             var element = this;
                             var adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
                             var adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
                             var btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
                             var btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
 
-                            var userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
-                            if(userExist == 'true'){
+                            if(userExist === 'true'){
+                                this.classList.remove('compare');
+                                this.classList.toggle('active');
                                 const newI = this.id.split('_')[1];
                                 await $.ajax({
                                     method: 'POST',
@@ -1032,17 +989,42 @@
                         });
                         $("#cart_"+i).click(async function(e){
                             e.preventDefault();
-                            var cartAlert = document.querySelector(".card-alert");
-                            cartAlert.style.display = 'block';
-                            setTimeout(() => {
-                                cartAlert.style.opacity = '1';
-                            }, 300);
-                            setTimeout(() => {
-                                cartAlert.style.opacity = '0';
-                            }, 4000);
-                            setTimeout(() => {
-                                cartAlert.style.display = 'none';
-                            }, 4500);
+                            if(userExist === 'true'){
+                                $(this).off('click');
+                                console.log('disabled');
+                                const addToCart = this.querySelector('i');
+                                addToCart.classList.toggle('active');
+                                const newI = this.id.split('_')[1];
+                                await $.ajax({
+                                    method: 'POST',
+                                    url: "{{ route('addToCart') }}",
+                                    data:{
+                                        'uid': response[newI]['uid'],
+                                    },
+                                    success: function(res) {
+                                        addToCart.classList.toggle('active');
+                                        if(res === '2'){
+                                            addToCart.classList.remove('fa-cart-plus');
+                                            addToCart.classList.add('fa-check');
+                                            const cartAlert = document.querySelector(".card-alert");
+                                            cartAlert.style.display = 'block';
+                                            setTimeout(() => {
+                                                cartAlert.style.opacity = '1';
+                                            }, 300);
+                                            setTimeout(() => {
+                                                cartAlert.style.opacity = '0';
+                                            }, 4000);
+                                            setTimeout(() => {
+                                                cartAlert.style.display = 'none';
+                                            }, 4500);
+                                        }else if(res === '1'){
+                                            addToCart.classList.remove('fa-check');
+                                            addToCart.classList.add('fa-cart-plus');
+                                            $(this).on('click');
+                                        }
+                                    }
+                                });
+                            }
                         });
                     }
                 }
@@ -1150,7 +1132,7 @@
         range.style.left = minHandle.offsetLeft + "px";
         range.style.width = maxHandle.offsetLeft - minHandle.offsetLeft + handleWidth + "px";
 
-        
+
         minPrice.innerHTML = '€' + Math.round(minHandle.offsetLeft  * maxValue / rangeWidth);
         maxPrice.innerHTML = '€' + Math.round((maxHandle.offsetLeft + maxHandle.offsetWidth) * maxValue / rangeWidth);
 
@@ -1169,7 +1151,7 @@
                 var imageUrl = $(this).attr("data-hover-slider-image");
                 var productCard = $(this).closest(".product-card");
                 var mainImage = productCard.find(".main-image");
-                
+
                 mainImage.attr("src", imageUrl);
 
                 var i = $(this).attr('data-hover-slider-i');
