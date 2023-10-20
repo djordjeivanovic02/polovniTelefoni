@@ -440,6 +440,7 @@ class FirebaseController extends Controller
                 $newAdd->isFavourite = $this->checkFavourite($adKey, FirebaseController::getUserUID());
                 $newAdd->compared = $this->checkCompared($adKey);
                 $newAdd->cart = $this->checkCart($adKey);
+                $newAdd->oldPrice = $adData['oldPrice'];
 
                 $newAdd['main-image'] = 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/main-image%2F'.$adData['brand'].'%2F' . $adData['model'] .'.jpg?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800';
 
@@ -500,7 +501,11 @@ class FirebaseController extends Controller
                 $newAdd->addons = $adData['addons'];
                 $newAdd->images = $adData['images'];
                 $newAdd->visits = $adData['visits'];
-                //$newAdd->cart = $adData['cart'];
+                $newAdd->cart = $this->checkCart($uid);
+                $newAdd->compared = $this->checkCompared($uid);
+                $newAdd->count = $adData['count'];
+                $newAdd->oldPrice = $adData['oldPrice'];
+                $newAdd->cartCount = $adData['cartCount'];
                 #endregion
 
                 $newAdd['main-image'] = 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/main-image%2F'.$adData['brand'].'%2F' . $adData['model'] .'.jpg?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800';
@@ -656,17 +661,38 @@ class FirebaseController extends Controller
             if($this->checkCart($uid)){
                 $cartCollection->document($uid)->delete();
                 $this->updateCartCached($uid, false, 1);
-                return 1;
+                if($this->incrementDecrementCartCount($uid, false)){
+                    return 1;
+                }
+                return 3;
             }else{
                 $date = date('d-m-y h:i:s');
                 $cartCollection->document($uid)->set([
                    'dateTime' => $date,
                 ]);
                 $this->updateCartCached($uid, true, 1);
-                return 2;
+                if($this->incrementDecrementCartCount($uid, true)){
+                    return 2;
+                }
+                return 3;
             }
         }catch (\Exception $e){
             return $e;
+        }
+    }
+    private function incrementDecrementCartCount($uid, $increment){
+        try{
+            $collection = $this->firestore->collection('ads');
+            $documentReference = $collection->document($uid);
+            $snapshot = $documentReference->snapshot();
+            if($snapshot->exists()){
+                $documentData = $snapshot->data();
+                $documentData['cartCount'] = $increment ? $documentData['cartCount'] + 1 : $documentData['cartCount'] - 1;
+                $documentReference->set($documentData);
+            }
+            return true;
+        }catch(\Exception $e){
+            return false;
         }
     }
     private function checkCart($uid){

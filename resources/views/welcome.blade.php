@@ -638,7 +638,6 @@
                                                 <span>
                                                     <bdi>
                                                         <span id='qv-old-price'>
-                                                            €699.55
                                                         </span>
                                                     </bdi>
                                                 </span>
@@ -647,7 +646,6 @@
                                                 <span>
                                                     <bdi>
                                                         <span id='qv-current-price'>
-                                                            €622.99
                                                         </span>
                                                     </bdi>
                                                 </span>
@@ -656,10 +654,10 @@
                                     </div>
                                     <div class="product-info">
                                         <div class="product-info-top">
-                                            <form action="" methid="post" class="cart single-ajax">
+                                            <form action="" method="post" class="cart single-ajax">
                                                 <div class="quantity">
                                                     <div class="quantity-bottom minus"></div>
-                                                    <input type="text" class="input-text qty text" name="quantity" id="quantity" size="4" min="1" max="5" step="1" inputmode="numeric" autocomplete="off" value="1">
+                                                    <input type="text" class="input-text qty text" name="quantity" id="quantity" size="4" min="1" max="5" step="1" inputmode="numeric" autocomplete="off" value="1" disabled>
                                                     <div class="quantity-bottom plus"></div>
                                                 </div>
                                                 <button type="submit" name="add-to-cart" class="button button-primary add-to-cart-button single-add-to-cart-button alt">
@@ -678,14 +676,14 @@
                                         <div class="product-info-bottom">
                                             <div class="info-message">
                                                 <i class="fa-solid fa-truck"></i>
-                                                <strong>Nacin isporuke i dogovoru sa prodavcem</strong>
+                                                <strong>Nacin isporuke u dogovoru sa prodavcem</strong>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="people-have product-message warning">
                                         <i class="fa-solid fa-bag-shopping"></i>
-                                        <strong>Drugi ljudi zele ovaj proizvod</strong>
-                                        25 ljudi ima ovaj proizvod u svojoj listi zelja.
+                                        <strong id="isWant">Drugi ljudi zele ovaj proizvod</strong>
+                                        <span id="howManyWant">25 ljudi ima ovaj proizvod u svojoj listi zelja.</span>
                                     </div>
                                     <div class="product-meta product-categories">
                                         <span class="posted-in">
@@ -738,7 +736,25 @@
 
 <script src="{{ asset('js/ads-widget.js') }}"></script>
 <script>
-    function showQuickView(uid, el){
+    const swiper = new Swiper('#product-images', {
+        slidesPerView: 1,
+        spaceBetween: 0,
+        loop: false,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+
+    const thumbnailSwiper = new Swiper('#product-thumbnails', {
+        slidesPerView: 'auto',
+        spaceBetween: 5,
+        freeMode: true,
+        loop: false
+    });
+
+    async function showQuickView(uid, el){
+        swiper.slideTo(0);
         el.classList.toggle('animated');
         document.getElementById('link1').href = "{{ asset('css/quick-preview-style.css') }}";
         document.getElementsByClassName('quick-view2')[0].style.display = 'block';
@@ -749,7 +765,8 @@
                 'X-CSRF-TOKEN': csrfToken
             }
         });
-        $.ajax({
+        var imagesLen = 0;
+        await $.ajax({
             method: 'POST',
             url: "{{ route('get-specific-ad') }}",
             data:{
@@ -763,10 +780,38 @@
                 document.getElementById('qv-star-rating').style.width = response['rates'] * 20 + '%';
                 document.getElementById('qv-views').innerHTML = (response['visits'] !== 1) ? response['visits'] + ' Pregleda' : '1 Pregled';
                 document.getElementById('qv-current-price').innerHTML = '€' + response['price'];
+                document.getElementById('qv-old-price').innerHTML = response['oldPrice'] !== '' ? ('€' + response['oldPrice']) : '';
+
+                const isWant = document.getElementById('isWant');
+                const howManyWant = document.getElementById('howManyWant');
+                const cartCount = response['cartCount'];
+                if(cartCount === 0){
+                    isWant.innerText = 'Niko nije oznacio da zeli ovaj proizvod';
+                    howManyWant.innerText = 'Budite prvi koji ce oznaciti da zeli ovaj proizvod.'
+                }else if(cartCount === 1){
+                    isWant.innerText = 'Drugi ljudi zele ovaj proizvod';
+                    howManyWant.innerText = 'Jedna osoba ima ovaj proizvod u svojoj listi zelja.'
+                }else if(cartCount === 2){
+                    isWant.innerText = 'Drugi ljudi zele ovaj proizvod';
+                    howManyWant.innerText = cartCount + ' osobe imaju ovaj proizvod u svojoj listi zelja.'
+                }else{
+                    isWant.innerText = 'Drugi ljudi zele ovaj proizvod';
+                    howManyWant.innerText = cartCount + ' osoba ima ovaj proizvod u svojoj listi zelja.'
+                }
 
                 var cont1 = document.querySelector('#product-images .swiper-wrapper');
                 var smallCont1 = document.querySelector('#product-thumbnails .swiper-wrapper2');
+
+                while(cont1.firstChild){
+                    cont1.removeChild(cont1.firstChild);
+                }
+                while(smallCont1.firstChild){
+                    smallCont1.removeChild(smallCont1.firstChild);
+                }
+
                 var images = response['images'];
+
+                imagesLen = images.length;
 
                 for(var i = 0; i < images.length; i++){
                     var div1 = document.createElement('div');
@@ -796,22 +841,74 @@
 
                 }
                 for(var i = 0; i < images.length; i++){
+                    const aEl = document.createElement('a');
                     var img1 = document.createElement('img');
                     img1.src = images[i];
                     img1.style.height = '100%';
                     img1.style.width = '100%';
                     img1.style.objectFit = 'cover';
+                    if(i === 0){
+                        img1.style.filter = 'brightness(0.3)';
+                    }
+                    aEl.appendChild(img1);
                     var smallDiv1 = document.createElement('div');
-                    smallDiv1.classList.add('swiper-slide', 'swiper-slide-visible', 'swiper-slide-thumb-active');
+                    smallDiv1.classList.add('swiper-slide', 'swiper-slide-visible');
                     smallDiv1.style.width = '85.5px';
                     smallDiv1.style.marginRight = '7px';
                     smallDiv1.setAttribute('role', 'group');
                     smallDiv1.setAttribute('aria-label', i + 1 +' / ' + images.length);
 
-                    smallDiv1.appendChild(img1);
+                    smallDiv1.appendChild(aEl);
                     smallCont1.appendChild(smallDiv1);
                 }
+
+                const quantityInput = document.getElementById('quantity');
+                quantityInput.setAttribute('max', response['count']);
+                quantityInput.value = 1;
+
+                const plusButton = document.querySelector('.quantity-bottom.plus');
+                const minusButton = document.querySelector('.quantity-bottom.minus');
+
+                plusButton.addEventListener('click', function(){
+                    const currentValue = parseInt(quantityInput.value, 10);
+                    const max = parseInt(quantityInput.getAttribute('max'), 10);
+
+                    if(currentValue < max){
+                        quantityInput.value = currentValue + 1;
+                    }
+                });
+                minusButton.addEventListener('click', function(){
+                    const currentValue = parseInt(quantityInput.value, 10);
+                    const min = parseInt(quantityInput.getAttribute('min'), 10);
+
+                    if(currentValue > min){
+                        quantityInput.value = currentValue - 1;
+                    }
+                });
+
             }
+        });
+
+        const thumbnailSlides = document.querySelectorAll('.swiper-slide');
+        thumbnailSlides.forEach(function (slide, index) {
+            const image = slide.querySelector('a img');
+            slide.addEventListener('click', function () {
+                thumbnailSlides.forEach(function (slide, index){
+                    var img = slide.querySelector('img');
+                    img.style.filter = 'brightness(1)';
+                });
+                image.style.filter = 'brightness(0.3)';
+                swiper.slideTo(index - 2*imagesLen);
+            });
+        });
+
+        swiper.on('slideChange', function(){
+            const thumbnailSlides = document.querySelectorAll('.swiper-wrapper2 .swiper-slide');
+            thumbnailSlides.forEach(function (slide, index){
+                const img = slide.querySelector('img');
+                img.style.filter = 'brightness(1)';
+            });
+            thumbnailSlides[swiper.activeIndex].querySelector('a img').style.filter = 'brightness(0.3)';
         });
     }
     function closeQuickView(){
@@ -819,47 +916,6 @@
         document.getElementsByClassName('quick-view2')[0].style.display = 'none';
     }
 
-    var swiper = new Swiper('#product-images', {
-        slidesPerView: 1,
-        spaceBetween: 0,
-        loop: true,
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-    });
-
-    swiper.on('slideChange', function(){
-        var index = 0;
-        var thumbnailSlides = document.querySelectorAll('.swiper-wrapper2 .swiper-slide');
-        thumbnailSlides.forEach(function (slide, index){
-            var img = slide.querySelector('img');
-            img.style.filter = 'brightness(1)';
-        });
-        thumbnailSlides[swiper.activeIndex].querySelector('a img').style.filter = 'brightness(0.3)';
-    });
-
-    var thumbnailSwiper = new Swiper('#product-thumbnails', {
-        slidesPerView: 'auto',
-        spaceBetween: 5,
-        freeMode: true,
-        loop: false
-    });
-
-    const next = document.querySelector('.swiper-button-next');
-    var thumbnailSlides = document.querySelectorAll('.swiper-slide');
-
-    thumbnailSlides.forEach(function (slide, index) {
-        var image = slide.querySelector('a img');
-        slide.addEventListener('click', function () {
-            thumbnailSlides.forEach(function (slide, index){
-                var img = slide.querySelector('img');
-                img.style.filter = 'brightness(1)';
-            });
-            image.style.filter = 'brightness(0.3)';
-            swiper.slideTo(index - 7);
-        });
-    });
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
     $.ajaxSetup({
         headers: {
@@ -1055,9 +1111,7 @@
             document.querySelector('.wishlist-alert').style.display = 'none';
         }, 300);
     });
-</script>
 
-<script>
     const categories = document.querySelectorAll('.product-cat');
     const mobilePhonesBrands = document.querySelectorAll('.mobile-phones-brands');
 
@@ -1158,10 +1212,7 @@
         isDragging = false;
         activeHandle = null;
     }
-</script>
 
-
-<script>
     $(document).ready(function() {
         $(".hover-slider-toggle-panel").hover(
             function() {

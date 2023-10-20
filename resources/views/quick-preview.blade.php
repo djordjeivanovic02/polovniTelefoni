@@ -22,11 +22,11 @@
                                     <div class="woocommerce-product-gallery">
                                         <div class="image-wrapper">
                                             <div id="product-images" class="swiper-container swiper-container-initialized swiper-container-horizontal swiper-container-pointer-events swiper-container-autoheight slider-loaded"
-                                            data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d" 
+                                            data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d"
                                             data-spacebetween="0" data-autoplay="false" data-autospeed="300" data-items="1" data-mobileItems="1" data-tabletItems="1">
                                                 <div class="swiper-wrapper" style="height:455px; transform: translate3d(0px, 0px, 0px)" id="swiper-wrapper-1" aria-live="polite">
                                                     <div class="swiper-slide swiper-slide-active" style="width: 100%; height: 100%" role="group" aria-label="1 / 8">
-                                                        <a href="">    
+                                                        <a href="">
                                                             <img src="{{ asset('images/phones3.jpg') }}">
                                                         </a>
                                                     </div>
@@ -67,7 +67,7 @@
                                         </div>
                                         <div class="thumbnails-wrapper">
                                             <div id="product-thumbnails" class="swiper-container swiper-container-initialized swiper-container-horizontal swiper-container-pointer-events swiper-container-free-mode swiper-container-thumbs slider-loaded" data-efect="slide"
-                                                data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d" 
+                                                data-effect="slide" data-direction="horizontal" data-loop="false" data-speed="1000d"
                                                 data-spacebetween="0" data-autoplay="false" data-autospeed="300" data-items="1" data-mobileItems="1" data-tabletItems="1">
                                                 <div class="swiper-wrapper swiper-wrapper2">
                                                     <div class="swiper-slide swiper-slide-visible swiper-slide-active swiper-slide-thumb-active"
@@ -172,7 +172,7 @@
                                 </div>
                                 <div class="product-info">
                                     <div class="product-info-top">
-                                        <form action="" methid="post" class="cart single-ajax">
+                                        <form action="" method="post" class="cart single-ajax">
                                             <div class="quantity">
                                                 <div class="quantity-bottom minus"></div>
                                                 <input type="text" class="input-text qty text" name="quantity" id="quantity" size="4" min="1" max="5" step="1" inputmode="numeric" autocomplete="off" value="1">
@@ -205,8 +205,8 @@
                                 </div>
                                 <div class="product-meta product-categories">
                                     <span class="posted-in">
-                                        Kategorije: 
-                                        <a href="#">Mobilni Telefoni</a>, 
+                                        Kategorije:
+                                        <a href="#">Mobilni Telefoni</a>,
                                         <a href="#">Apple</a>
                                     </span>
                                 </div>
@@ -220,36 +220,3 @@
     </div>
 </body>
 </html>
-
-<script>
-    const next = document.querySelector('.swiper-button-next');
-    next.addEventListener('click', function(){
-
-    })
-
-    // Inicijalizacija Swiper komponente
-    var swiper = new Swiper('#product-images', {
-        slidesPerView: 1,
-        spaceBetween: 0,
-        loop: false,
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-    });
-
-    var thumbnailSwiper = new Swiper('#product-thumbnails', {
-        slidesPerView: 'auto',
-        spaceBetween: 5, 
-        freeMode: true, 
-        loop: false
-    });
-
-    var thumbnailSlides = document.querySelectorAll('.swiper-slide');
-    thumbnailSlides.forEach(function (slide, index) {
-        slide.addEventListener('click', function () {
-            console.log(index - 7);
-            swiper.slideTo(index - 7); 
-        });
-    });
-</script>

@@ -6,7 +6,7 @@ function createWidget(data, i) {
         title: (data['adsTitle'].length >= 50) ? data['adsTitle'].substring(0, 50) + '...' : data['adsTitle'],
         rating: data['rates'],
         ratingCount: data['ratesCount'],
-        oldPrice: "100.00",
+        oldPrice: data['oldPrice'],
         newPrice: data['price'],
         brand: data['brand'],
         model: data['model'],
@@ -66,8 +66,8 @@ function createWidget(data, i) {
                                 <del aria-hidden="true">
                                     <span>
                                         <bdi>
-                                            <span>€</span>
-                                            ${productData.oldPrice}
+                                            <span style="${productData.oldPrice !== '' ? 'opacity: 1' : 'opacity: 0'}">€</span>
+                                            ${productData.oldPrice !== '' ? productData.oldPrice : ''}
                                         </bdi>
                                     </span>
                                 </del>
