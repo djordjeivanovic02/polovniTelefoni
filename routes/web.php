@@ -35,7 +35,7 @@ Route::get('/getLast', [FirebaseController::class, 'getLastNumericKey']);
 // Route::get('/rates', [FirebaseController::class, 'getRates']);
 
 Route::get('/quick-view', [QuickViewController::class, 'index']);
-Route::get('/wishlist', [MyAccountController::class, 'wishlist'])->name('wishlist');
+
 
 Route::middleware(['firebaseAuth'])->group(function () {
     // Zasticene stranice
@@ -54,4 +54,5 @@ Route::middleware(['firebaseAuth'])->group(function () {
     Route::post('/user/addToCompare', [FirebaseController::class, 'addToCompare'])->name('addToCompare');
     //Route::get('/user/countCompared', [FirebaseController::class, 'countCompared'])->name('countCompared');
     Route::post('user/addToCart', [FirebaseController::class, 'addToCart'])->name('addToCart');
+    Route::get('/wishlist', [MyAccountController::class, 'wishlist'])->name('wishlist');
 });

@@ -18,13 +18,22 @@ function createWidget(data, i) {
         isCart: data['cart'],
     };
 
-    const productHtml = `
+    var productHtml = `
         <div class="product-wrapper product-type-1">
             <div class="product-content">
                 <div class="thumbnail-wrapper">
-                    <div class="product-badges">
-                        <span class="badge onsale">11%</span>
-                    </div>
+                    <div class="product-badges">`;
+
+// <!--                        <span class="badge onsale">11%</span>-->
+
+    const sale = document.getElementsByClassName('product-badges')[0];
+    if(productData.oldPrice !== "" && productData.oldPrice > productData.newPrice){
+        const newVal = Math.floor((productData.oldPrice-productData.newPrice) / productData.oldPrice * 100);
+        productHtml += `<span class="badge onsale">-${newVal}%</span>`;
+    }
+
+
+    productHtml+= `</div>
                     <a href="">
                         <div class="product-card">
                             <div class="hover-slider-image-toggler">
@@ -49,7 +58,7 @@ function createWidget(data, i) {
                         <a href="#" id="wishlist_${i}" class="wishlist klbwl-btn ${productData.isFavourite ? 'favourite' : 'not'}"></a>
                         <a href="" class="mostcomments"></a>
                         <a href="" id="compare_${i}" class="klbcp-btn klbcp-btn-521 ${productData.isCompared ? 'compare' : 'not'}"></a>
-                        <a class="detail-bnt quickview" style="cursor: pointer;" onclick="showQuickView('${productData.uid}', this)"></a>
+                        <a class="detail-bnt quickview" style="cursor: pointer;" onclick="showQuickView('${productData.uid}', this, ${i})"></a>
                     </div>
                 </div>
                 <div class="content-wrapper">
@@ -99,5 +108,6 @@ function createWidget(data, i) {
             </div>
         </div>
     `;
+
     return productHtml;
 }

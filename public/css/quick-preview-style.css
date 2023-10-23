@@ -10,7 +10,7 @@ html {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1042;
+    z-index: 999;
     overflow: hidden;
     position: fixed;
     background-color: #0b0b0b;
@@ -22,7 +22,7 @@ html {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1043;
+    z-index: 1000;
     position: fixed;
     outline: none;
 }
@@ -502,7 +502,43 @@ span.count {
 .single-product-wrapper form.cart .add-to-cart-button {
     border: none;
 }
+.add-to-cart-button.active span, .add-to-cart-button.added span{
+    display: none;
+}
+.add-to-cart-button.active::before{
+    content: "";
+    display: block;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+}
+.add-to-cart-button.added::before{
+    font-style: normal;
+    font-weight: normal;
+    display: inline-block;
+    text-decoration: inherit;
+    width: 1em;
+    margin-right: 0.2em;
+    text-align: center;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1em;
+    margin-left: 0.2em;
+    content: "\2713";
+    font-size: 0.875rem;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
 
+    100% {
+        transform: rotate(360deg);
+    }
+}
 .single-product-wrapper form.cart .add-to-cart-button {
     border-radius: 4px;
     height: 46px;

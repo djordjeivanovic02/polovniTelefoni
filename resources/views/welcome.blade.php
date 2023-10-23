@@ -654,13 +654,13 @@
                                     </div>
                                     <div class="product-info">
                                         <div class="product-info-top">
-                                            <form action="" method="post" class="cart single-ajax">
+                                            <form class="cart single-ajax">
                                                 <div class="quantity">
                                                     <div class="quantity-bottom minus"></div>
                                                     <input type="text" class="input-text qty text" name="quantity" id="quantity" size="4" min="1" max="5" step="1" inputmode="numeric" autocomplete="off" value="1" disabled>
                                                     <div class="quantity-bottom plus"></div>
                                                 </div>
-                                                <button type="submit" name="add-to-cart" class="button button-primary add-to-cart-button single-add-to-cart-button alt">
+                                                <button type="submit" name="add-to-cart" id="add-to-cart" class="button button-primary add-to-cart-button single-add-to-cart-button alt">
                                                     <span>Dodaj u korpu</span>
                                                 </button>
                                             </form>
@@ -753,7 +753,8 @@
         loop: false
     });
 
-    async function showQuickView(uid, el){
+    async function showQuickView(uid, el, iVal){
+        console.log(iVal);
         swiper.slideTo(0);
         el.classList.toggle('animated');
         document.getElementById('link1').href = "{{ asset('css/quick-preview-style.css') }}";
@@ -868,6 +869,20 @@
 
                 const plusButton = document.querySelector('.quantity-bottom.plus');
                 const minusButton = document.querySelector('.quantity-bottom.minus');
+                const addToCart = document.querySelector('#add-to-cart');
+                const cartForm = document.querySelector('.single-ajax');
+
+                $(addToCart).removeClass('active');
+                $(addToCart).removeClass('added');
+                addToCart.setAttribute('show', iVal);
+
+                // console.log(response['cart']);
+                // if(response['cart'] === true){
+                //     $(this).toggleClass('active');
+                //     $(this).toggleClass('added');
+                // }else{
+                //     $(this).toggleClass('active');
+                // }
 
                 plusButton.addEventListener('click', function(){
                     const currentValue = parseInt(quantityInput.value, 10);
@@ -885,7 +900,44 @@
                         quantityInput.value = currentValue - 1;
                     }
                 });
+                cartForm.addEventListener('submit', function(e){
+                    e.preventDefault();
+                });
+                addToCart.addEventListener('click', async function(e){
+                    e.preventDefault();
+                    const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
+                    if(userExist === 'true') {
+                        if ($(this).hasClass('disabled')) {
+                            return;
+                        }
+                        $(this).removeClass('added');
+                        $(this).addClass('disabled');
+                        $(this).toggleClass('active');
 
+                        const showValue = this.getAttribute('show');
+                        console.log("#cart_"+showValue);
+                        const res = await addToCartFunc(document.querySelector('#cart_'+showValue), response);
+                        if (res === 2) {
+                            const cartAlert = document.querySelector(".card-alert");
+                            cartAlert.style.display = 'block';
+                            setTimeout(() => {
+                                cartAlert.style.opacity = '1';
+                            }, 300);
+                            setTimeout(() => {
+                                cartAlert.style.opacity = '0';
+                            }, 4000);
+                            setTimeout(() => {
+                                cartAlert.style.display = 'none';
+                            }, 4500);
+                            $(this).toggleClass('active');
+                            $(this).toggleClass('added');
+                        } else if (res === 1) {
+                            $(this).toggleClass('active');
+                            // $(element).querySelector('span').style.display = 'block';
+                        }
+                    }
+                    $(this).removeClass('disabled');
+                })
             }
         });
 
@@ -894,7 +946,7 @@
             const image = slide.querySelector('a img');
             slide.addEventListener('click', function () {
                 thumbnailSlides.forEach(function (slide, index){
-                    var img = slide.querySelector('img');
+                    const img = slide.querySelector('img');
                     img.style.filter = 'brightness(1)';
                 });
                 image.style.filter = 'brightness(0.3)';
@@ -943,12 +995,12 @@
 
                         $(".hover-slider-toggle-panel").hover(
                             function() {
-                                var imageUrl = $(this).attr("data-hover-slider-image");
-                                var productCard = $(this).closest(".product-card");
-                                var mainImage = productCard.find(".main-image");
-                                var i = $(this).attr('data-hover-slider-i');
+                                const imageUrl = $(this).attr("data-hover-slider-image");
+                                const productCard = $(this).closest(".product-card");
+                                const mainImage = productCard.find(".main-image");
+                                const i = $(this).attr('data-hover-slider-i');
 
-                                var newImage = new Image();
+                                const newImage = new Image();
                                 newImage.src = imageUrl;
 
                                 newImage.onload = function() {
@@ -960,150 +1012,167 @@
                         );
                         $("#wishlist_"+i).click(async function(e){
                             e.preventDefault();
-
-                            this.disabled = true;
-                            var element = this;
-                            var adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
-                            var btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
-                            var btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
-                            var adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
-
-                            if(userExist === 'true'){
-                                if($(this).hasClass('disabled')){
-                                    return;
-                                }
-                                $(this).addClass('disabled');
-                                const element = this;
-                                this.classList.remove('favourite');
-                                this.classList.remove('not');
-                                this.classList.toggle('active');
-                                const newI = this.id.split('_')[1];
-                                await $.ajax({
-                                    method: 'POST',
-                                    url: "{{ route('addToFavourite') }}",
-                                    data:{
-                                        'uid': response[newI]['uid'],
-                                    },
-                                    success: function(res){
-                                        element.classList.toggle('active');
-                                        if(res === '2'){
-                                            btnAction.classList.add('favourite');
-                                            btnAction.classList.remove('compared');
-                                            element.classList.remove('not');
-                                            element.classList.add('favourite');
-                                            adTitle.innerHTML = response[newI]['adsTitle'];
-                                            adAction.innerHTML = 'je dodat u listu zelja.'
-                                            btnActionText.innerHTML = 'Pogledaj Listu Zelja';
-                                            document.querySelector('.wishlist-alert').style.display = 'block';
-                                            setTimeout(function() {
-                                                document.querySelector('.wishlist-alert .wishlist-alert-bellow').style.opacity = '1';
-                                            }, 300);
-                                        }else if(res === '1'){
-                                            element.classList.remove('favourite');
-                                            element.classList.add('not');
-                                        }
-                                        $(element).removeClass('disabled');
-                                    }
-                                });
-                            }else{
-                                window.location.href = '/login-register';
-                            }
+                            const element = this;
+                            await addToWishlist(element, response);
                         });
                         $("#compare_"+i).click(async function(e){
                             e.preventDefault();
-                            var element = this;
-                            var adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
-                            var adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
-                            var btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
-                            var btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
-
-                            if(userExist === 'true'){
-                                if($(this).hasClass('disabled')){
-                                    return;
-                                }
-                                $(this).addClass('disabled');
-                                const element = this;
-                                this.classList.remove('compare');
-                                this.classList.toggle('active');
-                                const newI = this.id.split('_')[1];
-                                await $.ajax({
-                                    method: 'POST',
-                                    url: "{{ route('addToCompare') }}",
-                                    data:{
-                                        'uid': response[newI]['uid'],
-                                    },
-                                    success: function(res){
-                                        element.classList.toggle('active');
-                                        if(res === '2'){
-                                            btnAction.classList.remove('favourite');
-                                            btnAction.classList.add('compared');
-                                            element.classList.add('compare');
-                                            adTitle.innerHTML = response[newI]['adsTitle'];
-                                            adAction.innerHTML = 'je dodat u listu za poredjenje.'
-                                            btnActionText.innerHTML = 'Pogledaj Listu Poredjenja';
-                                            document.querySelector('.wishlist-alert').style.display = 'block';
-                                            setTimeout(function() {
-                                                document.querySelector('.wishlist-alert .wishlist-alert-bellow').style.opacity = '1';
-                                            }, 300);
-                                        }else if(res === '1'){
-                                            element.classList.remove('compare');
-                                        }else if(res === '3'){
-                                            console.log('Vec imate maksimalan broj uredjaj koje mozete uporediti.');
-                                        }
-                                        $(element).removeClass('disabled');
-                                    }
-                                });
-                            }else{
-                                window.location.href = '/login-register';
-                            }
+                            const element = this;
+                            await addToCompare(element, response);
                         });
                         $("#cart_"+i).click(async function(e){
                             e.preventDefault();
-                            if(userExist === 'true'){
-                                if($(this).hasClass('disabled')){
-                                    return;
-                                }
-                                $(this).addClass('disabled');
-                                const element = this;
-                                const addToCart = this.querySelector('i');
-                                addToCart.classList.toggle('active');
-                                const newI = this.id.split('_')[1];
-                                await $.ajax({
-                                    method: 'POST',
-                                    url: "{{ route('addToCart') }}",
-                                    data:{
-                                        'uid': response[newI]['uid'],
-                                    },
-                                    success: function(res) {
-                                        addToCart.classList.toggle('active');
-                                        if(res === '2'){
-                                            addToCart.classList.remove('fa-cart-plus');
-                                            addToCart.classList.add('fa-check');
-                                            const cartAlert = document.querySelector(".card-alert");
-                                            cartAlert.style.display = 'block';
-                                            setTimeout(() => {
-                                                cartAlert.style.opacity = '1';
-                                            }, 300);
-                                            setTimeout(() => {
-                                                cartAlert.style.opacity = '0';
-                                            }, 4000);
-                                            setTimeout(() => {
-                                                cartAlert.style.display = 'none';
-                                            }, 4500);
-                                        }else if(res === '1'){
-                                            addToCart.classList.remove('fa-check');
-                                            addToCart.classList.add('fa-cart-plus');
-                                        }
-                                        $(element).removeClass('disabled');
-                                    }
-                                });
-                            }
+                            await addToCartFunc(this, response);
                         });
                     }
                 }
             }
         }
     });
+
+    async function addToWishlist(element, response){
+        const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
+        const adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
+        const btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
+        const btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
+        const adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
+
+        if(userExist === 'true'){
+            if($(element).hasClass('disabled')){
+                return;
+            }
+            $(element).addClass('disabled');
+            element.classList.remove('favourite');
+            element.classList.remove('not');
+            element.classList.toggle('active');
+            const newI = element.id.split('_')[1];
+            await $.ajax({
+                method: 'POST',
+                url: "{{ route('addToFavourite') }}",
+                data:{
+                    'uid': response[newI]['uid'],
+                },
+                success: function(res){
+                    element.classList.toggle('active');
+                    if(res === '2'){
+                        btnAction.classList.add('favourite');
+                        btnAction.classList.remove('compared');
+                        element.classList.remove('not');
+                        element.classList.add('favourite');
+                        adTitle.innerHTML = response[newI]['adsTitle'];
+                        adAction.innerHTML = 'je dodat u listu zelja.'
+                        btnActionText.innerHTML = 'Pogledaj Listu Zelja';
+                        document.querySelector('.wishlist-alert').style.display = 'block';
+                        setTimeout(function() {
+                            document.querySelector('.wishlist-alert .wishlist-alert-bellow').style.opacity = '1';
+                        }, 300);
+                    }else if(res === '1'){
+                        element.classList.remove('favourite');
+                        element.classList.add('not');
+                    }
+                    $(element).removeClass('disabled');
+                }
+            });
+        }else{
+            window.location.href = '/login-register';
+        }
+    }
+    async function addToCompare(element, response){
+        const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
+        const adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
+        const adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
+        const btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
+        const btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
+
+        if(userExist === 'true'){
+            if($(element).hasClass('disabled')){
+                return;
+            }
+            $(element).addClass('disabled');
+            element.classList.remove('compare');
+            element.classList.toggle('active');
+            const newI = element.id.split('_')[1];
+            await $.ajax({
+                method: 'POST',
+                url: "{{ route('addToCompare') }}",
+                data:{
+                    'uid': response[newI]['uid'],
+                },
+                success: function(res){
+                    element.classList.toggle('active');
+                    if(res === '2'){
+                        btnAction.classList.remove('favourite');
+                        btnAction.classList.add('compared');
+                        element.classList.add('compare');
+                        adTitle.innerHTML = response[newI]['adsTitle'];
+                        adAction.innerHTML = 'je dodat u listu za poredjenje.'
+                        btnActionText.innerHTML = 'Pogledaj Listu Poredjenja';
+                        document.querySelector('.wishlist-alert').style.display = 'block';
+                        setTimeout(function() {
+                            document.querySelector('.wishlist-alert .wishlist-alert-bellow').style.opacity = '1';
+                        }, 300);
+                    }else if(res === '1'){
+                        element.classList.remove('compare');
+                    }else if(res === '3'){
+                        console.log('Vec imate maksimalan broj uredjaj koje mozete uporediti.');
+                    }
+                    $(element).removeClass('disabled');
+                }
+            });
+        }else{
+            window.location.href = '/login-register';
+        }
+    }
+    async function addToCartFunc(element, response){
+        return new Promise((resolve, reject) => {
+            const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
+            if (userExist === 'true') {
+                if ($(element).hasClass('disabled')) {
+                    resolve(0);
+                }
+                $(element).addClass('disabled');
+                const addToCart = element.querySelector('i');
+                addToCart.classList.toggle('active');
+                const newI = element.id.split('_')[1];
+                $.ajax({
+                    method: 'POST',
+                    url: "{{ route('addToCart') }}",
+                    data: {
+                        'uid': (response.length > 1) ? response[newI]['uid'] : response['uid'],
+                        'quantity': 1,
+                    },
+                    success: function (res) {
+                        addToCart.classList.toggle('active');
+                        if (res === '2') {
+                            addToCart.classList.remove('fa-cart-plus');
+                            addToCart.classList.add('fa-check');
+                            const cartAlert = document.querySelector(".card-alert");
+                            cartAlert.style.display = 'block';
+                            setTimeout(() => {
+                                cartAlert.style.opacity = '1';
+                            }, 300);
+                            setTimeout(() => {
+                                cartAlert.style.opacity = '0';
+                            }, 4000);
+                            setTimeout(() => {
+                                cartAlert.style.display = 'none';
+                            }, 4500);
+                            resolve(2);
+                        } else if (res === '1') {
+                            addToCart.classList.remove('fa-check');
+                            addToCart.classList.add('fa-cart-plus');
+                            resolve(1);
+                        }
+                        $(element).removeClass('disabled');
+                        resolve(0);
+                    }
+                });
+            } else {
+                window.location.href = '/login-register';
+                reject('Korisnik nije prijavljen!');
+            }
+        });
+    }
 
     document.querySelector('.wishlist-alert .wishlist-alert-bellow .close').addEventListener('click', function(){
         document.querySelector('.wishlist-alert .wishlist-alert-bellow').style.opacity = '0';

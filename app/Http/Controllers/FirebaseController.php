@@ -653,6 +653,7 @@ class FirebaseController extends Controller
     }
     public function addToCart(Request $request){
         $uid = $request->input('uid');
+        $quantity = $request->input('quantity');
         try {
             $uidUser = FirebaseController::getUserUID();
             $collection = $this->firestore->collection('users');
@@ -668,7 +669,8 @@ class FirebaseController extends Controller
             }else{
                 $date = date('d-m-y h:i:s');
                 $cartCollection->document($uid)->set([
-                   'dateTime' => $date,
+                    'dateTime' => $date,
+                    'quantity' => $quantity,
                 ]);
                 $this->updateCartCached($uid, true, 1);
                 if($this->incrementDecrementCartCount($uid, true)){
