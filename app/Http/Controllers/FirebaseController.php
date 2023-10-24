@@ -568,6 +568,11 @@ class FirebaseController extends Controller
             }
             Cache::put("cached_ads_page_$page", $cachedAds, 300);
         }
+        if(Cache::has($uid)){
+            $cachedAds = Cache::get($uid);
+            $cachedAds->isFavourite = $fav;
+            Cache::put($uid, $cachedAds, 300);
+        }
     }
     private function updateCompareCached($uid, $compare, $page){
         $cacheName = "cached_ads_page_$page";
@@ -580,6 +585,11 @@ class FirebaseController extends Controller
             }
             Cache::put("cached_ads_page_$page", $cachedAds, 300);
         }
+        if(Cache::has($uid)){
+            $cachedAds = Cache::get($uid);
+            $cachedAds->compared = $compare;
+            Cache::put($uid, $cachedAds, 300);
+        }
     }
     private function updateCartCached($uid, $cart, $page){
         $cacheName = "cached_ads_page_$page";
@@ -591,6 +601,11 @@ class FirebaseController extends Controller
                 }
             }
             Cache::put("cached_ads_page_$page", $cachedAds, 300);
+        }
+        if(Cache::has($uid)){
+            $cachedAds = Cache::get($uid);
+            $cachedAds->cart = $cart;
+            Cache::put($uid, $cachedAds, 300);
         }
     }
     private function checkCompared($uid){
@@ -651,7 +666,8 @@ class FirebaseController extends Controller
             return $e;
         }
     }
-    public function addToCart(Request $request){
+    public function addToCart(Request $request): \Exception|int
+    {
         $uid = $request->input('uid');
         $quantity = $request->input('quantity');
         try {
