@@ -1106,8 +1106,8 @@
                         });
                         $("#compare_"+i).click(async function(e){
                             e.preventDefault();
-                            const element = this;
-                            await addToCompare(element, response);
+                            const newI = this.id.split('_')[1];
+                            await addToCompare(this, response[newI]['uid'], response[newI]['adsTitle']);
                         });
                         document.querySelector('#cart_'+i).setAttribute('adsTitle', response[i]['adsTitle']);
                         $("#cart_"+i).click(async function(e){
