@@ -665,10 +665,10 @@
                                                 </button>
                                             </form>
                                             <div class="product-actions">
-                                                <a href="#" class="widslist klbwl-btn klbwl-product-in-list">
+                                                <a href="#" class="wishlist klbwl-btn klbwl-product-in-list" id="add-to-favourite">
                                                     Dodaj u listu zelja
                                                 </a>
-                                                <a href="#" class="klbcp-btn" style="margin-left: 20px;">
+                                                <a href="#" class="klbcp-btn" style="margin-left: 20px;" id="add-to-compare">
                                                     Uporedi
                                                 </a>
                                             </div>
@@ -754,7 +754,6 @@
     });
 
     async function showQuickView(uid, el, iVal){
-        console.log(iVal);
         swiper.slideTo(0);
         el.classList.toggle('animated');
         document.getElementById('link1').href = "{{ asset('css/quick-preview-style.css') }}";
@@ -800,8 +799,8 @@
                     howManyWant.innerText = cartCount + ' osoba ima ovaj proizvod u svojoj listi zelja.'
                 }
 
-                var cont1 = document.querySelector('#product-images .swiper-wrapper');
-                var smallCont1 = document.querySelector('#product-thumbnails .swiper-wrapper2');
+                const cont1 = document.querySelector('#product-images .swiper-wrapper');
+                const smallCont1 = document.querySelector('#product-thumbnails .swiper-wrapper2');
 
                 while(cont1.firstChild){
                     cont1.removeChild(cont1.firstChild);
@@ -810,19 +809,19 @@
                     smallCont1.removeChild(smallCont1.firstChild);
                 }
 
-                var images = response['images'];
+                const images = response['images'];
 
                 imagesLen = images.length;
 
-                for(var i = 0; i < images.length; i++){
-                    var div1 = document.createElement('div');
+                for(let i = 0; i < images.length; i++){
+                    const div1 = document.createElement('div');
                     div1.classList.add('swiper-slide', 'swiper-slide-active');
                     div1.style.width = '100%';
                     div1.style.height = '100%';
                     div1.setAttribute('role', 'group');
                     div1.setAttribute('aria-label', i + 1 +' / ' + images.length);
 
-                    var div2 = document.createElement('div');
+                    const div2 = document.createElement('div');
                     div2.classList.add('swiper-slide', 'swiper-slide-visible');
                     if(i === 0){
                         div2.classList.add('swiper-slide-thumb-active');
@@ -834,16 +833,16 @@
                     div1.setAttribute('role', 'group');
                     div1.setAttribute('aria-label', i + 1 +' / ' + images.length);
 
-                    var img1 = document.createElement('img');
+                    const img1 = document.createElement('img');
                     img1.src = images[i];
                     div2.appendChild(img1);
                     div1.appendChild(div2);
                     cont1.appendChild(div1);
 
                 }
-                for(var i = 0; i < images.length; i++){
+                for(let i = 0; i < images.length; i++){
                     const aEl = document.createElement('a');
-                    var img1 = document.createElement('img');
+                    const img1 = document.createElement('img');
                     img1.src = images[i];
                     img1.style.height = '100%';
                     img1.style.width = '100%';
@@ -852,7 +851,7 @@
                         img1.style.filter = 'brightness(0.3)';
                     }
                     aEl.appendChild(img1);
-                    var smallDiv1 = document.createElement('div');
+                    const smallDiv1 = document.createElement('div');
                     smallDiv1.classList.add('swiper-slide', 'swiper-slide-visible');
                     smallDiv1.style.width = '85.5px';
                     smallDiv1.style.marginRight = '7px';
@@ -876,13 +875,12 @@
                 $(addToCart).removeClass('added');
                 addToCart.setAttribute('show', iVal);
 
-                // console.log(response['cart']);
-                // if(response['cart'] === true){
-                //     $(this).toggleClass('active');
-                //     $(this).toggleClass('added');
-                // }else{
-                //     $(this).toggleClass('active');
-                // }
+                if(response['cart'] === true){
+                    //$(addToCart).toggleClass('active');
+                    $(addToCart).addClass('added');
+                }else{
+                    $(addToCart).removeClass('added');
+                }
 
                 plusButton.addEventListener('click', function(){
                     const currentValue = parseInt(quantityInput.value, 10);
@@ -900,11 +898,17 @@
                         quantityInput.value = currentValue - 1;
                     }
                 });
+
                 cartForm.addEventListener('submit', function(e){
                     e.preventDefault();
                 });
-                addToCart.addEventListener('click', async function(e){
+                addToCart.setAttribute('uid', response['uid']);
+                const cartAlertTemp = document.querySelector(".card-alert");
+                const cartAlertTitleTemp = cartAlertTemp.querySelector('#ads-title');
+                cartAlertTitleTemp.innerHTML = response['adsTitle'];
+                $(addToCart).click(async function(e){
                     e.preventDefault();
+                    const uid = addToCart.getAttribute('uid');
                     const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
                     if(userExist === 'true') {
                         if ($(this).hasClass('disabled')) {
@@ -915,8 +919,7 @@
                         $(this).toggleClass('active');
 
                         const showValue = this.getAttribute('show');
-                        console.log("#cart_"+showValue);
-                        const res = await addToCartFunc(document.querySelector('#cart_'+showValue), response);
+                        const res = await addToCartFunc(document.querySelector('#cart_'+showValue), uid);
                         if (res === 2) {
                             const cartAlert = document.querySelector(".card-alert");
                             cartAlert.style.display = 'block';
@@ -937,7 +940,36 @@
                         }
                     }
                     $(this).removeClass('disabled');
-                })
+                });
+
+                const addToFavourite = document.querySelector('#add-to-favourite');
+                addToFavourite.setAttribute('uid', response['uid']);
+                addToFavourite.setAttribute('adsTitle', response['adsTitle']);
+                addToFavourite.setAttribute('show', iVal);
+                $(addToFavourite).click(async function(e){
+                    e.preventDefault();
+                    const uid = this.getAttribute('uid');
+                    const adsTitle = this.getAttribute('adsTitle');
+                    const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
+                    if(userExist === 'true') {
+                        $(this).addClass('loading');
+                        if ($(this).hasClass('disabled')) {
+                            return;
+                        }
+                        const showValue = this.getAttribute('show');
+                        const res = await addToWishlist(document.querySelector('#wishlist_'+showValue), uid, adsTitle);
+                        $(this).removeClass('loading');
+                        if(res === 2){
+                            $(this).addClass('added');
+                            $(this).innerHTML = 'Ukloni iz liste zelja';
+                        }else if(res === 1){
+                            $(this).removeClass('added');
+                            $(this).innerHTML = 'Dodaj u listu zelja';
+                        }else{
+                            alert('Doslo je do greske, molimo pokusajte kasnije!');
+                        }
+                    }
+                });
             }
         });
 
@@ -1012,17 +1044,22 @@
                         );
                         $("#wishlist_"+i).click(async function(e){
                             e.preventDefault();
-                            const element = this;
-                            await addToWishlist(element, response);
+                            const newI = this.id.split('_')[1];
+                            await addToWishlist(this, response[newI]['uid'], response[newI]['adsTitle']);
                         });
                         $("#compare_"+i).click(async function(e){
                             e.preventDefault();
                             const element = this;
                             await addToCompare(element, response);
                         });
+                        document.querySelector('#cart_'+i).setAttribute('adsTitle', response[i]['adsTitle']);
                         $("#cart_"+i).click(async function(e){
                             e.preventDefault();
-                            await addToCartFunc(this, response);
+                            const cartAlertTemp = document.querySelector(".card-alert");
+                            const cartAlertTitleTemp = cartAlertTemp.querySelector('#ads-title');
+                            cartAlertTitleTemp.innerHTML = this.getAttribute('adsTitle');
+                            const newI = this.id.split('_')[1];
+                            await addToCartFunc(this, response[newI]['uid']);
                         });
                     }
                 }
@@ -1030,52 +1067,58 @@
         }
     });
 
-    async function addToWishlist(element, response){
-        const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
-        const adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
-        const btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
-        const btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
-        const adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
+    async function addToWishlist(element, uid, title){
+        return new Promise((resolve, reject) => {
+            const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
+            const adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
+            const btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
+            const btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
+            const adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
 
-        if(userExist === 'true'){
-            if($(element).hasClass('disabled')){
-                return;
-            }
-            $(element).addClass('disabled');
-            element.classList.remove('favourite');
-            element.classList.remove('not');
-            element.classList.toggle('active');
-            const newI = element.id.split('_')[1];
-            await $.ajax({
-                method: 'POST',
-                url: "{{ route('addToFavourite') }}",
-                data:{
-                    'uid': response[newI]['uid'],
-                },
-                success: function(res){
-                    element.classList.toggle('active');
-                    if(res === '2'){
-                        btnAction.classList.add('favourite');
-                        btnAction.classList.remove('compared');
-                        element.classList.remove('not');
-                        element.classList.add('favourite');
-                        adTitle.innerHTML = response[newI]['adsTitle'];
-                        adAction.innerHTML = 'je dodat u listu zelja.'
-                        btnActionText.innerHTML = 'Pogledaj Listu Zelja';
-                        document.querySelector('.wishlist-alert').style.display = 'block';
-                        setTimeout(function() {
-                            document.querySelector('.wishlist-alert .wishlist-alert-bellow').style.opacity = '1';
-                        }, 300);
-                    }else if(res === '1'){
-                        element.classList.remove('favourite');
-                        element.classList.add('not');
-                    }
-                    $(element).removeClass('disabled');
+            if (userExist === 'true') {
+                if ($(element).hasClass('disabled')) {
+                    return;
                 }
-            });
-        }else{
-            window.location.href = '/login-register';
-        }
+                $(element).addClass('disabled');
+                element.classList.remove('favourite');
+                element.classList.remove('not');
+                element.classList.toggle('active');
+                const newI = element.id.split('_')[1];
+                $.ajax({
+                    method: 'POST',
+                    url: "{{ route('addToFavourite') }}",
+                    data: {
+                        'uid': uid,
+                    },
+                    success: function (res) {
+                        element.classList.toggle('active');
+                        if (res === '2') {
+                            btnAction.classList.add('favourite');
+                            btnAction.classList.remove('compared');
+                            element.classList.remove('not');
+                            element.classList.add('favourite');
+                            adTitle.innerHTML = title;
+                            adAction.innerHTML = 'je dodat u listu zelja.'
+                            btnActionText.innerHTML = 'Pogledaj Listu Zelja';
+                            document.querySelector('.wishlist-alert').style.display = 'block';
+                            setTimeout(function () {
+                                document.querySelector('.wishlist-alert .wishlist-alert-bellow').style.opacity = '1';
+                            }, 300);
+                            resolve(2);
+                        } else if (res === '1') {
+                            element.classList.remove('favourite');
+                            element.classList.add('not');
+                            resolve(1);
+                        }
+                        $(element).removeClass('disabled');
+                        resolve(0);
+                    }
+                });
+            } else {
+                window.location.href = '/login-register';
+                reject('Korisnik nije prijavljen!');
+            }
+        });
     }
     async function addToCompare(element, response){
         const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
@@ -1138,7 +1181,7 @@
                     method: 'POST',
                     url: "{{ route('addToCart') }}",
                     data: {
-                        'uid': (response.length > 1) ? response[newI]['uid'] : response['uid'],
+                        'uid':  response,
                         'quantity': 1,
                     },
                     success: function (res) {
