@@ -500,12 +500,10 @@ class FirebaseController extends Controller
                 $newAdd->color = $adData['color'];
                 $newAdd->addons = $adData['addons'];
                 $newAdd->images = $adData['images'];
-                $newAdd->visits = $adData['visits'];
-                $newAdd->cart = $this->checkCart($uid);
+                $newAdd->isFavourite = $this->checkFavourite($uid, FirebaseController::getUserUID());
                 $newAdd->compared = $this->checkCompared($uid);
-                $newAdd->count = $adData['count'];
+                $newAdd->cart = $this->checkCart($uid);
                 $newAdd->oldPrice = $adData['oldPrice'];
-                $newAdd->cartCount = $adData['cartCount'];
                 #endregion
 
                 $newAdd['main-image'] = 'https://firebasestorage.googleapis.com/v0/b/polovni-telefoni-b4d1c.appspot.com/o/main-image%2F'.$adData['brand'].'%2F' . $adData['model'] .'.jpg?alt=media&token=f2662cca-d2a6-4969-a1fe-c7340cce2800';

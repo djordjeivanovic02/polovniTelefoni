@@ -668,7 +668,7 @@
                                                 <a href="#" class="wishlist klbwl-btn klbwl-product-in-list" id="add-to-favourite">
                                                     Dodaj u listu zelja
                                                 </a>
-                                                <a href="#" class="klbcp-btn" style="margin-left: 20px;" id="add-to-compare">
+                                                <a href="#" class="klbcp-btn comp" style="margin-left: 20px;" id="add-to-compare">
                                                     Uporedi
                                                 </a>
                                             </div>
@@ -946,29 +946,86 @@
                 addToFavourite.setAttribute('uid', response['uid']);
                 addToFavourite.setAttribute('adsTitle', response['adsTitle']);
                 addToFavourite.setAttribute('show', iVal);
+
+                if(response['isFavourite']){
+                    addToFavourite.classList.add('added');
+                    addToFavourite.innerHTML = 'Ukloni iz liste zelja';
+                }else{
+                    addToFavourite.classList.remove('added');
+                    addToFavourite.innerHTML = 'Dodaj u listu zelja';
+                }
+
                 $(addToFavourite).click(async function(e){
                     e.preventDefault();
                     const uid = this.getAttribute('uid');
                     const adsTitle = this.getAttribute('adsTitle');
                     const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
                     if(userExist === 'true') {
-                        $(this).addClass('loading');
                         if ($(this).hasClass('disabled')) {
                             return;
                         }
+                        $(this).removeClass('added');
+                        $(this).addClass('loading');
+                        $(this).addClass('disabled');
                         const showValue = this.getAttribute('show');
                         const res = await addToWishlist(document.querySelector('#wishlist_'+showValue), uid, adsTitle);
                         $(this).removeClass('loading');
                         if(res === 2){
                             $(this).addClass('added');
-                            $(this).innerHTML = 'Ukloni iz liste zelja';
+                            addToFavourite.innerHTML = 'Ukloni iz liste zelja';
+
                         }else if(res === 1){
                             $(this).removeClass('added');
-                            $(this).innerHTML = 'Dodaj u listu zelja';
+                            addToFavourite.innerHTML = 'Dodaj u listu zelja';
                         }else{
                             alert('Doslo je do greske, molimo pokusajte kasnije!');
                         }
                     }
+                    $(this).removeClass('disabled');
+                });
+
+                const addToCompareTemp = document.querySelector('#add-to-compare');
+                addToCompareTemp.setAttribute('uid', response['uid']);
+                addToCompareTemp.setAttribute('adsTitle', response['adsTitle']);
+                addToCompareTemp.setAttribute('show', iVal);
+
+                if(response['compared']){
+                    addToCompareTemp.classList.add('added');
+                    addToCompareTemp.innerHTML = 'Ukloni iz liste za poredjenje';
+                }else{
+                    addToCompareTemp.classList.remove('added');
+                    addToCompareTemp.innerHTML = 'Dodaj u listu za poredjenje';
+                }
+
+                $(addToCompareTemp).click(async function(e){
+                    e.preventDefault();
+                    const uid = this.getAttribute('uid');
+                    const adsTitle = this.getAttribute('adsTitle');
+                    const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
+                    if(userExist === 'true') {
+                        if ($(this).hasClass('disabled')) {
+                            return;
+                        }
+                        $(this).removeClass('added');
+                        $(this).addClass('loading');
+                        $(this).addClass('disabled');
+                        const showValue = this.getAttribute('show');
+                        const res = await addToCompare(document.querySelector('#compare_'+showValue), uid, adsTitle);
+                        $(this).removeClass('loading');
+                        if(res === 2){
+                            $(this).addClass('added');
+                            addToCompareTemp.innerHTML = 'Ukloni iz liste za poredjenje';
+                        }else if(res === 1){
+                            $(this).removeClass('added');
+                            addToCompareTemp.innerHTML = 'Dodaj u listu za poredjenje';
+                        }else if(res ===  3){
+                            alert('Dozvoljeno je maksimalno 4 uredjaja za poredjenje u istom trenutku');
+                        }
+                        else{
+                            alert('Doslo je do greske, molimo pokusajte kasnije!');
+                        }
+                    }
+                    $(this).removeClass('disabled');
                 });
             }
         });
@@ -1120,51 +1177,58 @@
             }
         });
     }
-    async function addToCompare(element, response){
-        const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
-        const adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
-        const adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
-        const btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
-        const btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
+    async function addToCompare(element, uid, title){
+        return new Promise((resolve, reject) => {
+            const userExist = "{{ Session::get('user') ? Session::get('user')->getUsername() ? 'true' : 'false' : 'false' }}";
+            const adTitle = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-title');
+            const adAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #ad-action');
+            const btnAction = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action');
+            const btnActionText = document.querySelector('.wishlist-alert .wishlist-alert-bellow .main-container #btn-action p');
 
-        if(userExist === 'true'){
-            if($(element).hasClass('disabled')){
-                return;
-            }
-            $(element).addClass('disabled');
-            element.classList.remove('compare');
-            element.classList.toggle('active');
-            const newI = element.id.split('_')[1];
-            await $.ajax({
-                method: 'POST',
-                url: "{{ route('addToCompare') }}",
-                data:{
-                    'uid': response[newI]['uid'],
-                },
-                success: function(res){
-                    element.classList.toggle('active');
-                    if(res === '2'){
-                        btnAction.classList.remove('favourite');
-                        btnAction.classList.add('compared');
-                        element.classList.add('compare');
-                        adTitle.innerHTML = response[newI]['adsTitle'];
-                        adAction.innerHTML = 'je dodat u listu za poredjenje.'
-                        btnActionText.innerHTML = 'Pogledaj Listu Poredjenja';
-                        document.querySelector('.wishlist-alert').style.display = 'block';
-                        setTimeout(function() {
-                            document.querySelector('.wishlist-alert .wishlist-alert-bellow').style.opacity = '1';
-                        }, 300);
-                    }else if(res === '1'){
-                        element.classList.remove('compare');
-                    }else if(res === '3'){
-                        console.log('Vec imate maksimalan broj uredjaj koje mozete uporediti.');
-                    }
-                    $(element).removeClass('disabled');
+            if (userExist === 'true') {
+                if ($(element).hasClass('disabled')) {
+                    return;
                 }
-            });
-        }else{
-            window.location.href = '/login-register';
-        }
+                $(element).addClass('disabled');
+                element.classList.remove('compare');
+                element.classList.toggle('active');
+                const newI = element.id.split('_')[1];
+                $.ajax({
+                    method: 'POST',
+                    url: "{{ route('addToCompare') }}",
+                    data: {
+                        'uid': uid,
+                    },
+                    success: function (res) {
+                        element.classList.toggle('active');
+                        if (res === '2') {
+                            btnAction.classList.remove('favourite');
+                            btnAction.classList.add('compared');
+                            element.classList.add('compare');
+                            adTitle.innerHTML = title;
+                            adAction.innerHTML = 'je dodat u listu za poredjenje.'
+                            btnActionText.innerHTML = 'Pogledaj Listu Poredjenja';
+                            document.querySelector('.wishlist-alert').style.display = 'block';
+                            setTimeout(function () {
+                                document.querySelector('.wishlist-alert .wishlist-alert-bellow').style.opacity = '1';
+                            }, 300);
+                            resolve(2);
+                        } else if (res === '1') {
+                            element.classList.remove('compare');
+                            resolve(1);
+                        } else if (res === '3') {
+                            console.log('Vec imate maksimalan broj uredjaj koje mozete uporediti.');
+                            resolve(3);
+                        }
+                        $(element).removeClass('disabled');
+                        resolve(0);
+                    }
+                });
+            } else {
+                window.location.href = '/login-register';
+                reject('Morate biti prijavljeni');
+            }
+        });
     }
     async function addToCartFunc(element, response){
         return new Promise((resolve, reject) => {
